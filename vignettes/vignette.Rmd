@@ -1,0 +1,115 @@
+---
+title: "GSA-Lightning: Ultra-fast Permutation-based Gene Set Analysis"
+author: "Billy Heung Wing Chang"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+# 1. Introduction
+
+GSA-Lightning is an ultra-fast implementation of permutation-based gene set analysis. Similar to existing methods, GSA-Lightning takes as inputs a gene expression data set and a set of gene sets. The functionality is similar to the GSA algorithm of (Efron 2007), and performs permutation tests using a combined Student-T test statistics. In particular GSA-Lightning retains the "mean", "absmean", and the restandardization procedure of GSA. The speed of GSA-Lightning, however, is much faster, particularly when the number of gene sets and the number of permutation are large.
+
+# 2. Demonstration
+
+## 2.1 Quick Start
+We begin by first loading the GSA-Lightning package.
+
+```{r}
+library(GSALightning)
+```
+
+We now read in a breast cancer expression data set and the patients' status data. The data set is obtained from The Cancer Genome Atlas (TCGA) consortium (The Cancer Genome Atlas 2012), processed by the Pan-Cancer Project group (Weinstein 2013), and downloaded using the Bioconductor package ELMER (Yao 2015). The gene names have been converted to gene symbols in this data set.
+
+```{r}
+data(expression)
+data(sampleInfo)
+```
+
+We next read in the gene sets of interest for our demonstration. This gene sets contain the target genes of 104,636 distal regulatory elements, obtained from the supplementary materials of (Lu 2015).
+
+```{r}
+data(targetGenes)
+```
+Genes with 0 sample variance are removed. 
+
+```{r}
+expression <- expression[apply(expression,1,sd) != 0,]
+```
+
+All necessary material are now ready for running GSA-Lightning. The main function of GSA-Lightning is GSALight(), which performs the permutation-based gene set analysis. Below we will restrict the analysis to gene sets with more than or equal to 7 genes (by setting "minsize = 7", and consider the "absmean" gene-set test-statistics (by setting "method = 'absmean'". 10,000 permutations (by setting "nperm = 10000") will be performed:
+
+```{r}
+GSALightResults <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes, 
+		   		   	       nperm = 10000, method = 'absmean', restandardize = FALSE, minsize = 7, 
+					       rmGSGenes = 'gene', verbose = TRUE)
+
+head(GSALightResults)
+```
+Note that in the above the option "rmGSGenes" was set to "TRUE", and genes without expression measurements were removed from the gene sets. One must be careful whether to perform this automatically using GSALight(); will removing a gene from a gene set or pathway alter the implications of the results? Alternatively, one may also consider removing the gene sets with non-measured expression by setting "rmGSGenes = 'gs'".
+
+
+## 2.2 Default Number of Permutations
+In the previous function call, the number of permutations was set at 10,000. In practice this is not enough for producing accurate p-values. By leaving the number of permutation unspecified, GSALight will automatically set the number of permutations to:
+
+(number of gene sets)/0.05 x 2
+
+This number of permutations will suffice for accurate p-values estimation, when the significance level is set at 0.05, even after Bonferroni correction.
+
+We now run GSALight using the default number of permutations. To minimize outputs, we set "verbose" to FALSE to suppress outputs from GSALight.
+
+```{r}
+GSALightResults <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes, 
+		   		   	       method = 'absmean', restandardize = FALSE, minsize = 7, 
+					       rmGSGenes = 'gene', verbose = FALSE)
+```
+
+Note that the number of permutation is automatically set to 196,800 here, which is 4920/0.05*2.
+
+We now investigate the p-value distribution:
+
+```{r}
+hist(GSALightResults[,'p-value'], main=NULL, xlab='p-value')
+```
+
+From the histogram of the p-values, we observe that almost all gene sets have small p-values. (Efron 2007) has discussed this problem, and suggested restandardization as a remedial method.
+
+## 2.3 Restandardization
+
+GSALightning can perform the restandardization method of (Efron 2007) by setting the option "restandardization" to "TRUE". We now run GSALight with restandardization, and investigate the p-value distribution:
+
+```{r}
+GSALightResultsReStand <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes, 
+		   		   	       method = 'absmean', restandardize = TRUE, minsize = 7, 
+					       rmGSGenes = 'gene', verbose = FALSE)
+hist(GSALightResultsReStand[,'p-value'], main=NULL, xlab='p-value')
+```
+
+Notice that the p-values are now more evenly distributed compared to the previous results obtained without restandardization.
+
+# 2.4 Single Gene Permutation Test
+A fast implementation of single gene permutation test is also included in the GSA-Lightning package, taking advantage of the fast permutation test implementation used in GSALight(). To run single gene testing, use the permTestLight() function, as follows:
+
+```{r}
+singleGeneAnalysis <- permTestLight(eset = expression, fac = factor(sampleInfo$TN),
+		   		  	   	             nperm = 10000,  method = 'absmean', verbose = TRUE)
+head(singleGeneAnalysis)
+```
+
+# References
+
+BHW Chang and W Tian (2015). GSA-Lightning: Ultra Fast Permutation-based Gene Set Analysis. (Submitted)
+
+B Efron and RJ Tibshirani (2007). "On testing the significance of sets of genes." The annals of applied statistics 1(1):107-129
+
+The Cancer Genome Atlas (2012) Comprehensive molecular characterization of human colon and rectal cancer. Nature 487:330-337.
+
+Weinstein, John N., et al. "The cancer genome atlas pan-cancer analysis project." Nature genetics 45.10 (2013): 1113-1120.
+
+L Yao et. al. (2015) Inferring regulatory element landscapes and transcription factor networks from cancer methylomes. Genome Biology 16:105
+
+Lu, Yulan, Yuanpeng Zhou, and Weidong Tian. "Combining Hi-C data with phylogenetic correlation to predict the target genes of distal regulatory elements in human genome." Nucleic acids research (2013): gkt785.
