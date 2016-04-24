@@ -381,7 +381,7 @@ dataTable2Mat <- function(gsTable) {
     mat <- sparseMatrix(gs,geneFactor,x=1)
 
     if (any(mat > 1)) {
-        warning("There appears to be duplicated genes in some gene sets. The duplicated genes are removed.")
+        warning("There appears to be duplicated genes in some gene sets.")
         mat[mat > 1] <- 1
     }
     rownames(mat) <- tmpGS
