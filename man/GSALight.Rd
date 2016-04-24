@@ -9,7 +9,7 @@ GSALight is a fast implementation of two-sample permutation-based gene set analy
 }
 \usage{
 GSALight(eset, fac, gs, nperm = NULL, tests = c('unpaired','paired'), method = c("mean", "absmean"), 
-	 minsize = 1, maxsize = Inf, restandardize = T,
+	 minsize = 1, maxsize = Inf, restandardize = TRUE,
 	 npermBreaks = 2000, rmGSGenes = c('stop', 'gene', 'gs'), verbose = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -21,7 +21,7 @@ The expression matrix. Each row is a gene, and each column is a subject/sample. 
 Subject labels, for unpaired T-test, either a factor or something that can be coerced into a factor (e.g. 0 and 1, Experiment and Control). For paired T-test,  fac must be an integer vector of 1,-1,2,-2,..., where each number represents a pair, and the sign represents the conditions.
 }
   \item{gs}{
-The gene sets. Most commonly, gs is a list, where each element (named after the gene set) is a vector of genes belonging to the gene set. It can also be a binary sparse matrix, where each row is a gene set, and each column is a gene. For each row (i.e. a gene set), the row entry is 1 if the corresponding gene belongs to the gene set, and 0 otherwise. Alternatively it can be a data table, where the first column (must be named "geneSet") contains the names of the gene set, and the second column (must be named "gene") are the gene set genes. See the "targetGenes" data table attached to this package. 
+The gene sets. Most commonly, gs is a list, where each element (named after the gene set) is a vector of genes belonging to the gene set. It can also be a binary sparse matrix, where each row is a gene set, and each column is a gene. For each row (i.e. a gene set), the row entry is 1 if the corresponding gene belongs to the gene set, and 0 otherwise. Alternatively it can be a data table, where the first column (must be named "geneSet") contains the names of the gene set, and the second column (must be named "gene") are the gene set genes. 
 }
   \item{nperm}{
 Number of permutations. If unspecified, nperm will be set as the total number of gene sets divided by 0.05 times 2. This should be sufficient to estimate accurate p-values for Bonferroni Correction under significance level alpha = 0.05.
@@ -30,7 +30,7 @@ Number of permutations. If unspecified, nperm will be set as the total number of
 The tests to performed. Can be either the default "unpaired" for unpaired T-tests or "paired" for paired T-tests.
 }
   \item{method}{
-The method to combine the T-test statistics for each individual gene into a gene set test statistics. The default "mean" option considers the mean of the statistics of the genes inside a gene set, and "absmean" consider the mean of the absolute value of the statistics.
+The method to combine the T-test statistics for each individual gene into a gene set test statistics. The default "maxmean" uses the maxmean statistics proposed by Efron (2007). Other options are "mean", i.e. the mean of the statistics of the genes inside a gene set, and "absmean", the mean of the absolute value of the statistics.
 }
   \item{minsize}{
 Minimum gene set size (default = 1, i.e. even gene set with a single gene is allowed).
@@ -72,6 +72,7 @@ Billy Heung Wing Chang
 \examples{
 
 # see the vignette for more examples
+# this example is adapted from R GSA package (Efron 2007)
 
 set.seed(100)
 x <- matrix(rnorm(1000*20),ncol=20)

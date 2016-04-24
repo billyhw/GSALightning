@@ -26,7 +26,7 @@ Number of permutations. If unspecified, nperm will be set as the total number of
 The tests to performed. Can be either the default "unpaired" for unpaired T-tests or "paired" for paired T-tests.
 }
   \item{method}{
-The method to combine the T-test statistics for each individual gene into a gene set test statistics. The default "mean" option considers the mean of the statistics of the genes inside a gene set, and "absmean" consider the mean of the absolute value of the statistics.
+Modification of the T-test statistics for each individual gene for hypothesis testing. The default "mean" option uses the typical T-statistics. The other option "absmean" uses the absolute value of the T-statistics (which results in a two-side test).
 }
   \item{npermBreaks}{
 The batch size. When the number of permutation nperm is large, the permutations are broken into batches, and that permutation are performed with the batches sequentially run. Default is 2000.
@@ -52,6 +52,9 @@ Billy Heung Wing Chang
 \code{\link{GSALight}}
 }
 \examples{
+
+# see the vignette for more examples
+# this example is adapted from R GSA package (Efron 2007)
 
 set.seed(100)
 x <- matrix(rnorm(1000*20),ncol=20)
