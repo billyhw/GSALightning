@@ -1,3 +1,3 @@
-export(GSALight, permTestLight)
+export(GSALight, permTestLight, wilcoxTest)
 
 import(Matrix, data.table)
