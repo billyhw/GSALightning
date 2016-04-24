@@ -26,7 +26,7 @@ Number of permutations. If unspecified, nperm will be set as the total number of
 The tests to performed. Can be either the default "unpaired" for unpaired T-tests or "paired" for paired T-tests.
 }
   \item{method}{
-Modification of the T-test statistics for each individual gene for hypothesis testing. The default "mean" option uses the typical T-statistics. The other option "absmean" uses the absolute value of the T-statistics (which results in a two-side test).
+Modification of the T-test statistics for each individual gene for hypothesis testing. The default "mean" option uses the typical T-statistics. The other option "absmean" uses the absolute value of the T-statistics (which results in a two-sided test).
 }
   \item{npermBreaks}{
 The batch size. When the number of permutation nperm is large, the permutations are broken into batches, and that permutation are performed with the batches sequentially run. Default is 2000.
@@ -39,7 +39,7 @@ Should the progress be reported? Default = TRUE.
 The speed performance is sensitive to npermBreaks. Setting npermBreaks small can save memory, but will take longer to run. Setting npermBreaks large can speed up the process, but may run into memory issues. If the function is running slow, consider increase npermBreaks. If the function is running into memory issues, consider reducing npermBreaks. The default 2000 typically can provide a reasonable balance between speed and memory.
 }
 \value{
-A data frame with the p-values, the q-values (via Benjamini-Hochberg FDR control method), the gene statistics, and the gene set size. If method = 'mean', then the p-values and q-values for up-regulation and down-regulation are reported. Method = 'absmean' corresponds to a one-sided test of absolute changes in expression, hence only one set of p-values and one set of q-values will be reported.
+A data frame with the p-values, the q-values (via Benjamini-Hochberg FDR control method), the gene statistics, and the gene set size. If method = 'mean', then the p-values and q-values for up-regulation and down-regulation are reported. Method = 'absmean' corresponds to a two-sided test of absolute changes in expression, hence only one set of p-values and one set of q-values will be reported.
 }
 \references{
 BHW Chang and W Tian (2015). GSA-Lightning: Ultra Fast Permutation-based Gene Set Analysis. (Submitted)
