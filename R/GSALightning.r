@@ -271,10 +271,8 @@ GSALight <- function (eset, fac, gs, nperm = NULL, tests = c('unpaired','paired'
             if (sum(fac==1) > sum(fac==0)) lvls <- rev(lvls)
         
             pvals <- cbind(pval,1-pval)
-            #colnames(pvals) <- c(paste('up-regulated in', lvls[2]), paste('up-regulated in',lvls[1]))
             rownames(pvals) <- rownames(mat)
         
-            #if (sum(fac==1) > sum(fac==0)) pvals <- pvals[,2:1]
             qvals <- cbind(p.adjust(pvals[,1],'BH'),p.adjust(pvals[,2],'BH'))
 
             results <- cbind(pvals,qvals,obsOrig,rowSums(mat))
