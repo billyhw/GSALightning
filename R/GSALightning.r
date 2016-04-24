@@ -40,7 +40,7 @@ pvalFromPermMat <- function (obs, perms) {
     rowSums(perms <= tempObs)
 }
 
-permTestLight <- function(eset, fac, nperm, tests = c('unpaired','paired'), method = c('maxmean','mean','absmean'), npermBreaks = 2000, verbose = TRUE) {
+permTestLight <- function(eset, fac, nperm, tests = c('unpaired','paired'), method = c('mean','absmean'), npermBreaks = 2000, verbose = TRUE) {
 
     mat <- Diagonal(nrow(eset),1)
     rownames(mat) <- colnames(mat) <- rownames(eset)
