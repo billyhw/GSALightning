@@ -287,7 +287,7 @@ GSALight <- function (eset, fac, gs, nperm = NULL, tests = c('unpaired','paired'
             results <- cbind(pvals,qvals,obsOrig,rowSums(mat))
             colnames(results) <- c(paste('p-value:up-regulated in positives'), paste('p-value:up-regulated in negatives'),
                                    paste('q-value:up-regulated in positives'), paste('q-value:up-regulated in negatives'),
-                                   'statistics (up-related in positive)','# genes')
+                                   'statistics (up-regulated in positives)','# genes')
         }
     }
     results
