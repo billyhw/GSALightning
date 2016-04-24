@@ -270,17 +270,17 @@ GSALight <- function (eset, fac, gs, nperm = NULL, tests = c('unpaired','paired'
             fac <- as.numeric(as.factor(fac))-1
             if (sum(fac==1) > sum(fac==0)) lvls <- rev(lvls)
         
-            pvals <- cbind(1-pval,pval)
-            colnames(pvals) <- c(paste('up-regulated in', lvls[2]), paste('up-regulated in',lvls[1]))
+            pvals <- cbind(pval,1-pval)
+            #colnames(pvals) <- c(paste('up-regulated in', lvls[2]), paste('up-regulated in',lvls[1]))
             rownames(pvals) <- rownames(mat)
         
-            if (sum(fac==1) > sum(fac==0)) pvals <- pvals[,2:1]
+            #if (sum(fac==1) > sum(fac==0)) pvals <- pvals[,2:1]
             qvals <- cbind(p.adjust(pvals[,1],'BH'),p.adjust(pvals[,2],'BH'))
 
             results <- cbind(pvals,qvals,obsOrig,rowSums(mat))
             colnames(results) <- c(paste('p-value:up-regulated in', lvls[1]), paste('p-value:up-regulated in',lvls[2]),
                                    paste('q-value:up-regulated in', lvls[1]), paste('q-value:up-regulated in',lvls[2]),
-                                   'statistics','# genes')
+                                   paste('statistics: up-regulated in',lvls[2]),'# genes')
         }
         else {
             pvals <- cbind(1-pval,pval)
@@ -289,7 +289,7 @@ GSALight <- function (eset, fac, gs, nperm = NULL, tests = c('unpaired','paired'
             results <- cbind(pvals,qvals,obsOrig,rowSums(mat))
             colnames(results) <- c(paste('p-value:up-regulated in positives'), paste('p-value:up-regulated in negatives'),
                                    paste('q-value:up-regulated in positives'), paste('q-value:up-regulated in negatives'),
-                                   'statistics','# genes')
+                                   'statistics (up-related in positive)','# genes')
         }
     }
     results
@@ -382,6 +382,10 @@ dataTable2Mat <- function(gsTable) {
 
     mat <- sparseMatrix(gs,geneFactor,x=1)
 
+    if (any(mat > 1)) {
+        warning("There appears to be duplicated genes in some gene sets. The duplicated genes are removed.")
+        mat[mat > 1] <- 1
+    }
     rownames(mat) <- tmpGS
     colnames(mat) <- tmpGenes
 
