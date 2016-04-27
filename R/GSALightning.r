@@ -153,8 +153,8 @@ GSALight <- function (eset, fac, gs, nperm = NULL, tests = c('unpaired','paired'
         else {
             obs <- mat %*% obs
             obs <- as.vector(obs)
-            obsOrig <- obs/numGenes
-            obs <- (obs/numGenes - meanobs)/sdobs
+            #obsOrig <- obs/numGenes
+            obs <- obsOrig <- (obs/numGenes - meanobs)/sdobs*sqrt(numGenes)
         }
     }
     else {
@@ -197,7 +197,7 @@ GSALight <- function (eset, fac, gs, nperm = NULL, tests = c('unpaired','paired'
                 meanStar <- colSums(permMat*numCatGenes)/totCatGenes
                 sdStar <- sqrt((colSums({permMat^2}*numCatGenes) - totCatGenes*meanStar^2)/(totCatGenes - 1))
                 permMat <- as.matrix(mat%*%permMat)
-                permMat <- t((t(permMat/numGenes) - meanStar)/sdStar)
+                permMat <- t((t(permMat/numGenes) - meanStar)/sdStar)*sqrt(numGenes)
             }
         }
         else {
@@ -239,7 +239,7 @@ GSALight <- function (eset, fac, gs, nperm = NULL, tests = c('unpaired','paired'
                     meanStar <- colSums(permMat*numCatGenes)/totCatGenes
                     sdStar <- sqrt((colSums({permMat^2}*numCatGenes) - totCatGenes*meanStar^2)/(totCatGenes - 1))
                     permMat <- as.matrix(mat%*%permMat)
-                    permMat <- t((t(permMat/numGenes) - meanStar)/sdStar)
+                    permMat <- t((t(permMat/numGenes) - meanStar)/sdStar)*sqrt(numGenes)
                 }
             }
             else {
@@ -381,7 +381,7 @@ dataTable2Mat <- function(gsTable) {
     mat <- sparseMatrix(gs,geneFactor,x=1)
 
     if (any(mat > 1)) {
-        warning("There appears to be duplicated genes in some gene sets.")
+        warning("There appears to be duplicated genes in some gene sets. The duplicated genes are removed.")
         mat[mat > 1] <- 1
     }
     rownames(mat) <- tmpGS
