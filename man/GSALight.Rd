@@ -8,7 +8,7 @@ Fast Permutation-based Gene Set Analysis
 GSALight is a fast implementation of two-sample permutation-based gene set analysis. It supports the mean or absolute mean version of the permutation T-test as implemeneted in the GSA package. Restandardization is also supported.
 }
 \usage{
-GSALight(eset, fac, gs, nperm = NULL, tests = c('unpaired','paired'), method = c("mean", "absmean"), 
+GSALight(eset, fac, gs, nperm = NULL, tests = c('unpaired','paired'), method = c("maxmean","mean", "absmean"), 
 	 minsize = 1, maxsize = Inf, restandardize = TRUE,
 	 npermBreaks = 2000, rmGSGenes = c('stop', 'gene', 'gs'), verbose = TRUE)
 }
@@ -90,9 +90,11 @@ for(i in 1:50){
 }
 names(genesets)=paste("set",as.character(1:50),sep="")
 
+GSAmaxmean <- GSALight(x, y, genesets, nperm = 1000, method = 'maxmean', restandardize = FALSE, rmGSGenes = 'gene')
 GSAmean <- GSALight(x, y, genesets, nperm = 1000, method = 'mean', restandardize = FALSE, rmGSGenes = 'gene')
 GSAabs <- GSALight(x, y, genesets, nperm = 1000, method = 'absmean', restandardize = FALSE, rmGSGenes = 'gene')
 
+head(GSAmaxmean)
 head(GSAmean)
 head(GSAabs)
 
