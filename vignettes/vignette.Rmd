@@ -1,23 +1,60 @@
 ---
-title: "GSA-Lightning: Ultra-fast Permutation-based Gene Set Analysis"
+title: "GSALightning: Ultra-fast Permutation-based Gene Set Analysis"
 author: "Billy Heung Wing Chang"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output:
+  html_document:
+    theme: cosmo
+    toc: true
+    toc_depth: 3
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(cache=TRUE)
+```
 
-# 1. Introduction
+<style type="text/css">
 
-GSA-Lightning is an ultra-fast implementation of permutation-based gene set analysis. Similar to existing methods, GSA-Lightning takes as inputs a gene expression data set and a set of gene sets. The functionality is similar to the GSA algorithm of (Efron 2007), and performs permutation tests using a combined Student-T test statistics. In particular GSA-Lightning retains the "mean", "absmean", and the restandardization procedure of GSA. The speed of GSA-Lightning, however, is much faster, particularly when the number of gene sets and the number of permutation are large.
+body{ /* Normal  */
+   font-size: 16px;
+}
+td {  /* Table  */
+   font-size: 8px;
+}
+code.r{ /* Code block */
+  font-size: 14px;
+}
+pre { /* Code block */
+  font-size: 14px
+}
+</style>
 
-# 2. Demonstration
+## 1. Introduction
 
-## 2.1 Quick Start
-We begin by first loading the GSA-Lightning package.
+GSALightning is an ultra-fast implementation of permutation-based gene set analysis. Similar to existing methods, GSALightning takes as inputs a gene expression data set and a set of gene sets. The functionality is similar to the GSA algorithm of (Efron 2007), and performs permutation tests using a combined Student-T test statistics. In particular, GSALightning retains the "mean", "absmean", "maxmean" statistics, supports unpaired and paired two sample-tests, and the restandardization procedure of GSA. The speed of GSALightning, however, is much faster, particularly when the number of gene sets and the number of permutations are large.
+
+Currently, R implementation of GSA-Lightning is available on Github at https://github.com/billyhw/GSALightning.
+
+This document begins with an installation and quick-start guide for users. This document then goes deeper into the various functions and features of GSALightning.
+
+## 2. Installation and Quick Start
+
+### 2.1 Installing GSALightning
+
+We recommend installing GSA-Lightning using the R “devtools” package. To do this, install the R “devtools” package, and then in R type:
+
+```{r eval = FALSE}
+library(devtools) 
+install_github("billyhw/GSALightning")
+```
+
+### 2.2 Running GSALightning
+
+We begin by first loading the GSA-Lightning package:
 
 ```{r}
 library(GSALightning)
@@ -30,77 +67,270 @@ data(expression)
 data(sampleInfo)
 ```
 
-We next read in the gene sets of interest for our demonstration. This gene sets contain the target genes of 104,636 distal regulatory elements, obtained from the supplementary materials of (Lu 2015).
+We next read in the gene sets. This gene sets contain the target genes of 104,636 distal regulatory elements, obtained from the supplementary materials of (Lu 2015).
 
 ```{r}
 data(targetGenes)
 ```
-Genes with 0 sample variance are removed. 
+
+We next remove genes with 0 sample variance:
 
 ```{r}
 expression <- expression[apply(expression,1,sd) != 0,]
 ```
 
-All necessary material are now ready for running GSA-Lightning. The main function of GSA-Lightning is GSALight(), which performs the permutation-based gene set analysis. Below we will restrict the analysis to gene sets with more than or equal to 7 genes (by setting "minsize = 7", and consider the "absmean" gene-set test-statistics (by setting "method = 'absmean'". 10,000 permutations (by setting "nperm = 10000") will be performed:
+The main function of GSALightning is GSALight(). Skipping the details for now, we will run GSALight using the most of the default settings, and look at the results:
 
 ```{r}
 GSALightResults <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes, 
-		   		   	       nperm = 10000, method = 'absmean', restandardize = FALSE, minsize = 7, 
-					       rmGSGenes = 'gene', verbose = TRUE)
-
+		   		   	       nperm = 1000, minsize = 7, rmGSGenes = 'gene')
 head(GSALightResults)
 ```
-Note that in the above the option "rmGSGenes" was set to "TRUE", and genes without expression measurements were removed from the gene sets. One must be careful whether to perform this automatically using GSALight(); will removing a gene from a gene set or pathway alter the implications of the results? Alternatively, one may also consider removing the gene sets with non-measured expression by setting "rmGSGenes = 'gs'".
 
+As a reminder, in R, if a function's arguments are unspecified, the default settings for the arguments will be used. To explore the various arguments of GSALight(), type:
 
-## 2.2 Default Number of Permutations
-In the previous function call, the number of permutations was set at 10,000. In practice this is not enough for producing accurate p-values. By leaving the number of permutation unspecified, GSALight will automatically set the number of permutations to:
+```{r eval=FALSE}
+? GSALight
+```
 
-(number of gene sets)/0.05 x 2
+## 3. The Inputs for GSALight()
+
+There are three main inputs to GSALight(): an expression data set, the subject classes, and the gene sets.
+
+The expression data set is a matrix, where each row represents a gene and each column represents a subject. The expression data set is passed into GSALight() using the argument "eset":
+
+```{r}
+data(expression)
+expression[1:4,1:3]
+```
+
+_Note: The rows and columns of the expression data matrix must be names for GSALightning to work._
+
+The subject classes is a factor of classes for the subjects. 
+
+```{r}
+data(sampleInfo)
+head(sampleInfo$TN)
+```
+
+In the given sampleInfo data set, the third column "TN" contains the subject classes. In the GSALight() call in the earlier section, the "TN" column is passed into GSALight() as a factor vector through the argument "fac".
+
+The third input for GSALight() are the gene sets:
+
+```{r}
+data(targetGenes)
+targetGenes[1:3]
+```
+
+In the demonstration above, the gene sets are stored in "targetGenes"" as a list, where each element is a vector of genes belonging to a gene set. The gene sets are passed into GSALight() through the option "gs".
+
+_Advanced usage: alternatively, the gene sets can be a data.table, where the first column (must be named "geneSet") contains the names of the gene set, and the second column (must be named "gene") are the gene set genes. The gene sets can also be a binary sparse matrix, where each row is a gene set, and each column is a gene. For each row (i.e. a gene set), the row entry is 1 if the corresponding gene belongs to the gene set, and 0 otherwise._
+
+## 4. GSALight()
+
+The main function of GSA-Lightning is GSALight(), which performs permutation-based gene set analysis. 
+
+### 4.1 Preliminiary Data Check
+
+Prior to beginning the permutation, GSALight() will check for (1) if there are missing data in the expression data, (2) if any gene has zero sample variance, and (3) if there are genes in a gene set without expression measurements in the expression matrix. If any one of (1), (2), and (3) is true, GSALight() will return an error.
+
+Users are therefore recommended to ensure that missing data in the expression data is appropriately handled (e.g. through imputation) before running GSALight(). Also please ensure genes with zero (or small) sample variance are removed prior to running GSALight(). 
+
+To handle genes within gene sets with no expression measurements in the expression data, users can use the "rmGSGenes" argument. By setting "rmGSGenes = 'gene'", GSALight() will remove genes without expression measurement from the gene sets. Alternative, by setting "rmGSGenes = 'gs'", GSALight() will exclude gene sets with unmeasured genes entirely from the analysis.
+
+_Recommendation: before setting rmGSGenes = 'gene', please consider whether removing a gene from a gene set will alter the implications of the results._
+
+If we run GSALight() as follows, an error will return because there are genes with zero sample variance:
+```{r error=TRUE}
+data(expression)
+data(sampleInfo)
+data(targetGenes)
+GSALightResults <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes)
+```
+
+If we remove the genes with zero sample variance and rerun GSALight(), another error will be reported since genes within some gene sets without expression measurements:
+
+```{r error=TRUE}
+expression <- expression[apply(expression,1,sd) != 0,]
+GSALightResults <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes)
+```
+
+We will remove the genes without expression measurements from those gene sets by setting "rmGSGenes = 'gene'". GSALight() will now run and finish the permutation:
+
+```{r}
+GSALightResults <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes, 
+		   		   	       nperm = 1000, rmGSGenes = 'gene')
+head(GSALightResults)
+```
+
+### 4.2 Most Commonly Considered Arguments for GSALight()
+
+Below is a call to GSALight() where some commonly considered arguments are explicitly specified:
+```{r}
+GSALightResults <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes, 
+		   		   	       nperm = 1000, method = 'maxmean', restandardize = FALSE, minsize = 7, 
+					       maxsize = 30, rmGSGenes = 'gene', verbose = FALSE)
+```
+
+In the above:
+
+_eset = expression_:  the expression data set, with rows being the genes.
+
+_fac = factor(sampleInfo$TN)_:  the subject class labels.
+
+_gs = targetGenes_:  the list of gene sets.
+
+_nperm = 1000_:  the number of permutations for the permutation test.
+
+_method = "maxmean"_: the test statistics. Other choices include "mean" and "maxmean".
+
+_restandardize = FALSE_: whether restandardization will be performed. More on this later.
+
+_minsize = 7_:  the minimum number of genes a gene set must contained to be included in the analysis.
+
+_maxsize = 30_:  the maximum number of genes a gene set must contained to be included in the analysis.
+
+_rmGSGenes = 'gene'_: as discussed previously, this removes genes without expression measurements from the gene set.
+
+_verbose = TRUE_: GSALight() will report progress while running.
+
+### 4.3 The Maxmean, Mean, and Absolute Mean Statistics
+
+GSALight() offers three ways to combine the individual gene statistics into a gene set statistics. The default "maxmean" is the statistics proposed and recommended by Efron (2007). Other options are "mean", i.e. the mean of the statistics of the genes inside a gene set, and "absmean", the mean of the absolute value of the statistics.
+
+For example, to use the "mean" statistics, call:
+
+```{r}
+GSALightResultsMean <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes, 
+		   		   	       nperm = 1000, method = 'mean', restandardize = FALSE, minsize = 7, 
+					       maxsize = 30, rmGSGenes = 'gene', verbose = FALSE)
+```
+
+To use the "absmean" statistics, call:
+
+```{r}
+GSALightResultsAbs <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes, 
+		   		   	       nperm = 1000, method = 'absmean', restandardize = FALSE, minsize = 7, 
+					       maxsize = 30, rmGSGenes = 'gene', verbose = FALSE)
+```
+
+### 4.4 Outputs of GSALight()
+
+If the argument "method" is set to either "maxmean" or "mean", the output of GSALight() is a matrix with six columns:
+
+```{r}
+head(GSALightResults)
+head(GSALightResultsMean)
+```
+
+Each row represents the results for a gene set. As the column names suggest, the first two columns are the p-values for testing up-regulation in the two different subject classes. The next two columns are the q-values (that control for false discovery rate) for testing up-regulation in the two different subject classes. The fifth column is the gene set statistics, and the final column shows the number of genes within each gene set.
+
+If "method" is 'absmean', the output of GSALight() is a matrix with four columns:
+
+```{r}
+head(GSALightResultsAbs)
+```
+
+The first and second columns are respectively the p-values and q-values for each gene set. The third column is the gene set statistics, and the fourth column shows the number of genes within each gene set. The p-values and q-values are not seperately reported for up-regulation in different conditions. This is because the absolute mean statistics results in a two-sided test, hence GSALight() only report the two-sided p-value and q-value, and do not distinguished between the direction of the expression changes.
+
+### 4.5 Default Number of Permutations
+In the previous function call, the number of permutations was set at 1000. In practice this is not enough for producing accurate p-values. By leaving the number of permutation unspecified, GSALight will automatically set the number of permutations to:
+
+<center> (number of gene sets)/0.05 $\times$ 2 </center>
+
 
 This number of permutations will suffice for accurate p-values estimation, when the significance level is set at 0.05, even after Bonferroni correction.
 
-We now run GSALight using the default number of permutations. To minimize outputs, we set "verbose" to FALSE to suppress outputs from GSALight.
+We now run GSALight() using the default number of permutations. Here, we set "nperm" to NULL (alternatively, we may remove the "nperm" argument). In this case GSALight() will calculate the number of permutations using the formula above. Also to minimize outputs, we set "verbose" to FALSE to suppress outputs from GSALight(). 
+
+_Caution: the following will take some time to run._
 
 ```{r}
 GSALightResults <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes, 
-		   		   	       method = 'absmean', restandardize = FALSE, minsize = 7, 
+		   		   	       nperm = NULL, method = 'maxmean', restandardize = FALSE, minsize = 7, 
 					       rmGSGenes = 'gene', verbose = FALSE)
 ```
 
-Note that the number of permutation is automatically set to 196,800 here, which is 4920/0.05*2.
+Note that the number of permutation is automatically set to 194,760 here, which is 4869/0.05 $\times$ 2, where 4869 are the number of gene sets with 7 genes or more included in the analysis.
 
-We now investigate the p-value distribution:
+### 4.6 Restandardization
+
+We now investigate the p-values distribution from the results of the pervious call:
 
 ```{r}
-hist(GSALightResults[,'p-value'], main=NULL, xlab='p-value')
+hist(GSALightResults[,'p-value:up-regulated in Control'], main=NULL, xlab='p-value')
 ```
 
-From the histogram of the p-values, we observe that almost all gene sets have small p-values. (Efron 2007) has discussed this problem, and suggested restandardization as a remedial method.
+From the histogram of the p-values, we observe that many gene sets have very small p-values. Assuming that most gene sets should be insignificant, the p-values are expected to be more uniformly distributed. (Efron 2007) has discussed this problem, and suggested restandardization as a remedial method.
 
-## 2.3 Restandardization
-
-GSALightning can perform the restandardization method of (Efron 2007) by setting the option "restandardization" to "TRUE". We now run GSALight with restandardization, and investigate the p-value distribution:
+GSALight() can perform the restandardization method of (Efron 2007) by setting the argument "restandardization" to "TRUE". We now run GSALight() with restandardization, and investigate the p-values distribution:
 
 ```{r}
 GSALightResultsReStand <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes, 
-		   		   	       method = 'absmean', restandardize = TRUE, minsize = 7, 
+		   		   	       nperm = NULL, method = 'maxmean', restandardize = TRUE, minsize = 7, 
 					       rmGSGenes = 'gene', verbose = FALSE)
-hist(GSALightResultsReStand[,'p-value'], main=NULL, xlab='p-value')
+hist(GSALightResultsReStand[,'p-value:up-regulated in Control'], main=NULL, xlab='p-value')
 ```
 
-Notice that the p-values are now more evenly distributed compared to the previous results obtained without restandardization.
+Notice that the p-values are now more uniformly distributed compared to the previous non-restandardized results.
 
-# 2.4 Single Gene Permutation Test
-A fast implementation of single gene permutation test is also included in the GSA-Lightning package, taking advantage of the fast permutation test implementation used in GSALight(). To run single gene testing, use the permTestLight() function, as follows:
+Let's find the top ten most significantly up-regulated gene sets in the control group according to the p-values:
+```{r}
+GSALightResultsReStand[order(GSALightResultsReStand[,'p-value:up-regulated in Control'],decreasing=F)[1:10], c(2,4)]
+```
+
+The name of the gene sets are represented by the row names. With 4869 gene sets being analyzed, the Bonferroni-adjusted p-value threshold is approximately 0.00001. Since the smallest p-value is 0.00198, no gene set can be deemed significant. The q-values provide a threshold for controlling false discovery rate. q-value = 0.1 is one commonly used threshold. However, the smallest q-value is 0.836, and therefore no gene set can be deemed significant according to the q-value neither.
+
+## 5. Other Functions in GSALightning
+
+### 5.1 Single Gene Permutation Test
+A fast implementation of single-gene permutation test is also included in the GSALightning package, taking advantage of the fast permutation test implementation used in GSALight(). To run single-gene testing, use the permTestLight() function, as follows:
 
 ```{r}
 singleGeneAnalysis <- permTestLight(eset = expression, fac = factor(sampleInfo$TN),
-		   		  	   	             nperm = 10000,  method = 'absmean', verbose = TRUE)
+		   		  	   	             nperm = 1000,  method = 'mean', verbose = TRUE)
 head(singleGeneAnalysis)
 ```
 
-# References
+As in GSALight(), a default number of permutations can be set by setting "nperm" to NULL.
+
+_Note: The "maxmean" statistics is not defined for single gene testing, and hence is not available for permTestLight._
+
+### 5.2 Mann-Whitney U Test for Single Gene Testing
+In addition to permutation tests, the GSALightning package also offer the Mann-Whitney U test for single-gene testing. Briefly, Mann-Whitney U test is the non-parametric version of the independent t-test for two-sample problem. To perform the Mann-Whitney U test, call the wilcoxTest() function:
+
+```{r}
+singleWilcox <- wilcoxTest(eset = expression, fac = factor(sampleInfo$TN),
+		   		  	   	             tests = "unpaired")
+head(singleWilcox)
+```
+
+### 5.3 Gene Set Analysis for Paired Design
+
+Thus far this guide has only covered independent two-sample tests. In fact, all main functions in GSALightning, i.e. GSALight(), permTestLight(), and wilcoxTest(), also support paired two-sample test.
+
+To illustrate, this example uses GSALight() to perform paired-test. We will set up a set synthetic classes:
+
+```{r}
+fac <- 1:(ncol(expression)/2)
+fac <- c(fac, -fac)
+head(fac)
+tail(fac)
+```
+
+Notice how the classes are defined for paired-tests: the classes vector must be an integer vector of 1,-1,2,-2,3,-3,..., where each number represents a pair, and the sign represents the conditions.
+
+To use GSALight() to perform paired-test, set the "tests" argument to 'paired':
+```{r}
+GSALightResultsPaired <- GSALight(eset = expression, fac = fac, gs = targetGenes, 
+		   		   	       nperm = 1000, tests = 'paired', method = 'maxmean', restandardize = TRUE, minsize = 7, 
+					       rmGSGenes = 'gene', verbose = FALSE)
+head(GSALightResultsPaired)
+```
+
+The result is a matrix with six columns. Each row represents the results for a gene set. As the column names suggest, the first two columns are the p-values for testing up-regulation in the two different subjects classes. Here, "positives" denotes the class labeled with a positive integer, and "negatives" denotes the class labeled with a negative integer. The next two columns are the q-values (that control for false discovery rate) for testing up-regulation in the two different classes. The fifth column is the gene set statistics, and the final column shows the number of genes within each gene set.
+
+## References
 
 BHW Chang and W Tian (2015). GSA-Lightning: Ultra Fast Permutation-based Gene Set Analysis. (Submitted)
 
