@@ -153,7 +153,6 @@ GSALight <- function (eset, fac, gs, nperm = NULL, tests = c('unpaired','paired'
         else {
             obs <- mat %*% obs
             obs <- as.vector(obs)
-            #obsOrig <- obs/numGenes
             obs <- obsOrig <- (obs/numGenes - meanobs)/sdobs*sqrt(numGenes)
         }
     }
