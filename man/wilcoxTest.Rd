@@ -8,7 +8,7 @@ Single-Gene Mann Whitney Wilcoxon Test
 A two-sample single-gene differential expression analysis using the Mann Whitney Wilcoxon Test.
 }
 \usage{
-wilcoxTest(eset, fac, tests = c("paired", "unpaired"))
+wilcoxTest(eset, fac, tests = c("unpaired", "paired"))
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
