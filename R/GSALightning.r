@@ -389,7 +389,7 @@ dataTable2Mat <- function(gsTable) {
     mat
 }
 
-wilcoxTest <- function(eset, fac, tests=c("paired","unpaired")) {
+wilcoxTest <- function(eset, fac, tests=c("unpaired","paired")) {
 
     eset <- as.data.frame(t(eset))
     facn <- as.numeric(as.factor(fac))-1
