@@ -44,3 +44,12 @@ Version 1.1.2
 Added “importFrom("stats", "p.adjust", "rbinom", "var", "wilcox.test”)” to NAMESPACE
 Import “stats” in description
 Added back manual for “wilcoxTest”
+
+Version 1.1.3 and 1.1.4
+
+Bioconductor version updates.
+
+Version 1.1.5
+
+Updated references and manual and vignette.
+Added Github URL.
