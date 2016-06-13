@@ -7,7 +7,7 @@ is necessary for more accurate p-values estimation.
 
 ## Installation
 
-GSA-Lightning requires R 3.3.0 or above.
+GSA-Lightning requires R 3.3.0 or above (https://www.r-project.org/).
 
 We recommend using the R "devtools" package to install GSALightning from Github. 
 
@@ -28,6 +28,8 @@ GSA-Lightning is also available at Bioconductor:
 
 https://bioconductor.org/packages/release/bioc/html/GSALightning.html
 
+Although we recommend the Github version here.
+
 ## Code
 
 Please consult the R help page of GSA-Lightning for examples:
@@ -38,7 +40,7 @@ Please consult the R help page of GSA-Lightning for examples:
 
 ## Contributor
 
-Billy Heung Wing Chang
+Billy Heung Wing Chang (billyheungwing@gmail.com)
 
 ## Reference
 
