@@ -14,4 +14,5 @@ VignetteBuilder: knitr
 biocViews: Software, BiologicalQuestion, GeneSetEnrichment,
         DifferentialExpression, GeneExpression, Transcription
 NeedsCompilation: no
-Packaged: 2015-12-30 15:48:50 UTC; billyhw
+Packaged: 2016-05-07 10:02:31 UTC; billyhw
+Built: R 3.3.0; ; 2016-05-07 10:03:26 UTC; unix
