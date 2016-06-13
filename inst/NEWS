@@ -1,0 +1,46 @@
+Version 0.99.0
+
+Initial package submitted.
+
+Version 0.99.2
+
+Codes:
+
+Added calls to match.args() for partial matching.
+Added calls to isTRUE() for checking logical inputs.
+Replaces cat() with message().
+
+Vignette:
+
+Tabs are replaced by spaces.
+Added some math notations.
+
+R Dependency:
+
+Package built using R-devel version 3.3.0.
+R Dependecy updated to R (>= 3.3.0) in preparation for next Bioconductor release.
+
+Version 0.99.3
+
+Codes:
+
+All comments removed.
+' \n' are removed at end of messages, or the space before '\n' are removed.
+
+Version 1.1.1
+
+Codes:
+
+Added “maxmean” statistics.
+Added “wilcoxTest” for Mann-Whitney-U tests for single gene analysis.
+Default for GSALight() is now “maxmean” with restandardization.
+Fix some issues to make GSALight() equivalent to GSA of Efron and Tibshirani.
+The target gene list is now a list instead of a data table.
+The Vignette now contains a comprehensive user guide.
+All documentations are updated accordingly.
+
+Version 1.1.2
+
+Added “importFrom("stats", "p.adjust", "rbinom", "var", "wilcox.test”)” to NAMESPACE
+Import “stats” in description
+Added back manual for “wilcoxTest”
