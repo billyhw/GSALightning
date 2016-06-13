@@ -24,7 +24,7 @@ library(devtools)
 install_github("billyhw/GSALightning")
 ```
 
-Since the package contain some large example gene expression data sets, the download time may take a minute or so. Please kindly be patient.
+Since the package contains some large example gene expression data sets, the download time may take 1-3 minutes. Please kindly be patient.
 
 If the R vignette is also desired, use instead:
 
