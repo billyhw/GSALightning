@@ -37,7 +37,7 @@ pre { /* Code block */
 
 GSALightning is an ultra-fast implementation of permutation-based gene set analysis. Similar to existing methods, GSALightning takes as inputs a gene expression data set and a set of gene sets. The functionality is similar to the GSA algorithm of (Efron 2007), and performs permutation tests using a combined Student-T test statistics. In particular, GSALightning retains the "mean", "absmean", "maxmean" statistics, supports unpaired and paired two sample-tests, and the restandardization procedure of GSA. The speed of GSALightning, however, is much faster, particularly when the number of gene sets and the number of permutations are large.
 
-Currently, R implementation of GSA-Lightning is available on Github at https://github.com/billyhw/GSALightning.
+Currently, R implementation of GSA-Lightning is available at Bioconductor and on Github at https://github.com/billyhw/GSALightning.
 
 This document begins with an installation and quick-start guide for users. This document then goes deeper into the various functions and features of GSALightning.
 
