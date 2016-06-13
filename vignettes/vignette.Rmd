@@ -83,7 +83,7 @@ The main function of GSALightning is GSALight(). Skipping the details for now, w
 
 ```{r}
 GSALightResults <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes, 
-		   		   	       nperm = 1000, minsize = 7, rmGSGenes = 'gene')
+		   		   	       nperm = 1000, minsize = 10, rmGSGenes = 'gene')
 head(GSALightResults)
 ```
 
@@ -168,7 +168,7 @@ head(GSALightResults)
 Below is a call to GSALight() where some commonly considered arguments are explicitly specified:
 ```{r}
 GSALightResults <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes, 
-		   		   	       nperm = 1000, method = 'maxmean', restandardize = FALSE, minsize = 7, 
+		   		   	       nperm = 1000, method = 'maxmean', restandardize = FALSE, minsize = 10, 
 					       maxsize = 30, rmGSGenes = 'gene', verbose = FALSE)
 ```
 
@@ -186,7 +186,7 @@ _method = "maxmean"_: the test statistics. Other choices include "mean" and "max
 
 _restandardize = FALSE_: whether restandardization will be performed. More on this later.
 
-_minsize = 7_:  the minimum number of genes a gene set must contained to be included in the analysis.
+_minsize = 10_:  the minimum number of genes a gene set must contained to be included in the analysis.
 
 _maxsize = 30_:  the maximum number of genes a gene set must contained to be included in the analysis.
 
@@ -202,7 +202,7 @@ For example, to use the "mean" statistics, call:
 
 ```{r}
 GSALightResultsMean <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes, 
-		   		   	       nperm = 1000, method = 'mean', restandardize = FALSE, minsize = 7, 
+		   		   	       nperm = 1000, method = 'mean', restandardize = FALSE, minsize = 10, 
 					       maxsize = 30, rmGSGenes = 'gene', verbose = FALSE)
 ```
 
@@ -210,7 +210,7 @@ To use the "absmean" statistics, call:
 
 ```{r}
 GSALightResultsAbs <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes, 
-		   		   	       nperm = 1000, method = 'absmean', restandardize = FALSE, minsize = 7, 
+		   		   	       nperm = 1000, method = 'absmean', restandardize = FALSE, minsize = 10, 
 					       maxsize = 30, rmGSGenes = 'gene', verbose = FALSE)
 ```
 
@@ -247,7 +247,7 @@ _Caution: the following will take some time to run._
 
 ```{r}
 GSALightResults <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes, 
-		   		   	       nperm = NULL, method = 'maxmean', restandardize = FALSE, minsize = 7, 
+		   		   	       nperm = NULL, method = 'maxmean', restandardize = FALSE, minsize = 10, 
 					       rmGSGenes = 'gene', verbose = FALSE)
 ```
 
@@ -267,7 +267,7 @@ GSALight() can perform the restandardization method of (Efron 2007) by setting t
 
 ```{r}
 GSALightResultsReStand <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes, 
-		   		   	       nperm = NULL, method = 'maxmean', restandardize = TRUE, minsize = 7, 
+		   		   	       nperm = NULL, method = 'maxmean', restandardize = TRUE, minsize = 10, 
 					       rmGSGenes = 'gene', verbose = FALSE)
 hist(GSALightResultsReStand[,'p-value:up-regulated in Control'], main=NULL, xlab='p-value')
 ```
@@ -323,7 +323,7 @@ Notice how the classes are defined for paired-tests: the classes vector must be 
 To use GSALight() to perform paired-test, set the "tests" argument to 'paired':
 ```{r}
 GSALightResultsPaired <- GSALight(eset = expression, fac = fac, gs = targetGenes, 
-		   		   	       nperm = 1000, tests = 'paired', method = 'maxmean', restandardize = TRUE, minsize = 7, 
+		   		   	       nperm = 1000, tests = 'paired', method = 'maxmean', restandardize = TRUE, minsize = 10, 
 					       rmGSGenes = 'gene', verbose = FALSE)
 head(GSALightResultsPaired)
 ```
