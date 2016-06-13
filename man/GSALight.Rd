@@ -58,7 +58,7 @@ The speed performance of GSALight is sensitive to npermBreaks. Setting npermBrea
 A data frame with the p-values, the q-values (via Benjamini-Hochberg FDR control method), the gene set statistics, and the gene set size. If method = 'mean', then the p-values and q-values for up-regulation and down-regulation are reported. Method = 'absmean' corresponds to a two-sided test of absolute changes in expression, hence only one set of p-values and one set of q-values will be reported.
 }
 \references{
-BHW Chang and W Tian (2015). GSA-Lightning: Ultra Fast Permutation-based Gene Set Analysis. (Submitted)
+BHW Chang and W Tian (2015). GSA-Lightning: Ultra Fast Permutation-based Gene Set Analysis. Bioinformatics. doi: 10.1093/bioinformatics/btw349
 
 B Efron and RJ Tibshirani (2007). "On testing the significance of sets of genes." The annals of applied statistics 1(1):107-129
 }
