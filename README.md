@@ -28,7 +28,9 @@ GSA-Lightning is also available at Bioconductor:
 
 https://bioconductor.org/packages/release/bioc/html/GSALightning.html
 
-Although we recommend the Github version here.
+Also consider the development version:
+
+http://bioconductor.org/packages/devel/bioc/html/GSALightning.html
 
 ## Code
 
