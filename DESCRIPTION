@@ -9,6 +9,8 @@ Depends: R (>= 3.3.0)
 Imports: Matrix, data.table, stats
 Description: GSALightning provides a fast implementation of permutation-based gene set analysis for two-sample problem. This package is particularly useful when testing simultaneously a large number of gene sets, or when a large number of permutations is necessary for more accurate p-values estimation.
 License: GPL (>=2)
+URL: https://github.com/billyhw/GSALightning
+BugReports: https://github.com/billyhw/GSALightning/issues
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
 biocViews: Software, BiologicalQuestion, GeneSetEnrichment,

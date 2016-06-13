@@ -24,11 +24,18 @@ library(devtools)
 install_github("billyhw/GSALightning")
 ```
 
-GSA-Lightning is also available at Bioconductor:
+If the R vignette is also desired, use:
+
+```{r}
+library(devtools) 
+install_github("billyhw/GSALightning", build_vignette = TRUE)
+```
+
+The Bioconductor stable release of GSA-Lightning is at:
 
 https://bioconductor.org/packages/release/bioc/html/GSALightning.html
 
-Also consider the development version:
+However, currently the stable release is significantly outdated. For users who still prefer installing GSA-Lightning from Bioconductor, please consider the development version:
 
 http://bioconductor.org/packages/devel/bioc/html/GSALightning.html
 
