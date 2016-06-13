@@ -1,3 +1,5 @@
 export(GSALight, permTestLight, wilcoxTest)
 
 import(Matrix, data.table)
+
+importFrom("stats", "p.adjust", "rbinom", "var", "wilcox.test")
