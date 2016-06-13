@@ -24,12 +24,16 @@ library(devtools)
 install_github("billyhw/GSALightning")
 ```
 
-If the R vignette is also desired, use:
+Since the package contain some large example gene expression data sets, the download time may take a minute or so. Please kindly be patient.
+
+If the R vignette is also desired, use instead:
 
 ```{r}
 library(devtools) 
 install_github("billyhw/GSALightning", build_vignette = TRUE)
 ```
+
+Note the vignette will take some time to build (4-5 minutes) due to some large-scale analysis examples included in the vignette.
 
 The Bioconductor stable release of GSA-Lightning is at:
 
