@@ -53,3 +53,7 @@ Version 1.1.5
 
 Updated references and manual and vignette.
 Added Github URL.
+
+Version 1.1.6
+
+Fixed default settings of permTestLight() by adding match.args and setting nperm=NULL.
