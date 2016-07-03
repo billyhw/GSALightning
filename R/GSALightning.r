@@ -40,10 +40,18 @@ pvalFromPermMat <- function (obs, perms) {
     rowSums(perms <= tempObs)
 }
 
-permTestLight <- function(eset, fac, nperm, tests = c('unpaired','paired'), method = c('mean','absmean'), npermBreaks = 2000, verbose = TRUE) {
+permTestLight <- function(eset, fac, nperm = NULL, tests = c('unpaired','paired'), method = c('mean','absmean'), npermBreaks = 2000, verbose = TRUE) {
 
+    verbose <- isTRUE(verbose)
+
+    tests <- match.arg(tests)
+    method <- match.arg(method)
+        
     mat <- Diagonal(nrow(eset),1)
     rownames(mat) <- colnames(mat) <- rownames(eset)
+
+    message("Note that permTestLight() simply runs GSALight() by treating each individual gene as a gene set.")
+    
     results <- GSALight(eset, fac, mat, nperm, tests, method, restandardize = FALSE, npermBreaks=npermBreaks, verbose = verbose)
     results <- results[,-ncol(results)]
     
