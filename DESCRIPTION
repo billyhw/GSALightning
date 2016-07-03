@@ -1,7 +1,7 @@
 Package: GSALightning
 Type: Package
 Title: Fast Permutation-based Gene Set Analysis
-Version: 1.1.5
+Version: 1.1.6
 Date: 2015-12-30
 Author: Billy Heung Wing Chang
 Maintainer: Billy Heung Wing Chang <billyheungwing@gmail.com>
