@@ -38,10 +38,6 @@ The Bioconductor stable release of GSA-Lightning is at:
 
 https://bioconductor.org/packages/release/bioc/html/GSALightning.html
 
-However, currently the stable release is significantly outdated. For users who still prefer installing GSA-Lightning from Bioconductor, please consider the development version:
-
-http://bioconductor.org/packages/devel/bioc/html/GSALightning.html
-
 ## Code
 
 Please consult the R help page of GSA-Lightning for examples:
