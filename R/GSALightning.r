@@ -263,7 +263,6 @@ GSALight <- function (eset, fac, gs, nperm = NULL, tests = c('unpaired','paired'
         pval <- pvalSums/nperm
     }
 
-
     if (verbose) message("Permutation done. Evaluating P-values.")
     if (method == 'absmean') {
         pvals <- 1-pval
@@ -297,7 +296,8 @@ GSALight <- function (eset, fac, gs, nperm = NULL, tests = c('unpaired','paired'
                                    'statistics (up-regulated in positives)','# genes')
         }
     }
-    results
+
+    as.data.frame(results)
 
 }
 
