@@ -40,7 +40,7 @@ pvalFromPermMat <- function (obs, perms) {
     rowSums(perms <= tempObs)
 }
 
-permTestLight <- function(eset, fac, nperm = NULL, tests = c('unpaired','paired'), method = c('mean','absmean'), npermBreaks = 2000, verbose = TRUE) {
+permTestLight <- function(eset, fac, nperm, tests = c('unpaired','paired','multi','wilcox'), method = c('mean','absmean'), npermBreaks = 2000, verbose = TRUE) {
 
     verbose <- isTRUE(verbose)
 
@@ -57,9 +57,9 @@ permTestLight <- function(eset, fac, nperm = NULL, tests = c('unpaired','paired'
 
 }
 
-GSALight <- function (eset, fac, gs, nperm = NULL, tests = c('unpaired','paired'), method = c('maxmean','mean','absmean'),
-                      minsize = 1, maxsize = Inf, restandardize = TRUE, npermBreaks = 2000,
-                      rmGSGenes = c('stop', 'gene', 'gs'), verbose = TRUE) {
+GSALight <- function (eset, fac, gs, nperm = NULL, tests = c('unpaired','paired','multi','wilcox'), method = c('maxmean','mean','absmean'),
+                       minsize = 1, maxsize = Inf, restandardize = TRUE, npermBreaks = 2000,
+                       rmGSGenes = c('stop', 'gene', 'gs'), verbose = TRUE) {
 
     restandardize <- isTRUE(restandardize)
     verbose <- isTRUE(verbose)
@@ -80,6 +80,10 @@ GSALight <- function (eset, fac, gs, nperm = NULL, tests = c('unpaired','paired'
     if (tests == 'unpaired') {
         if (! is.factor(fac)) fac <- as.factor(fac)
         if (length(unique(fac)) > 2 ) stop("more than two classes detected. GSALightning only supports two-sample t-tests.")
+    }
+
+    if (tests == 'multi') {
+        if (method != 'mean') stop("For the multi-class test, only the 'mean' method is available. Please set the method to 'mean' and restart.")
     }
 
     if (is.data.table(gs)) mat <- dataTable2Mat(gs)
@@ -125,10 +129,17 @@ GSALight <- function (eset, fac, gs, nperm = NULL, tests = c('unpaired','paired'
 
     if (verbose) message("After gene set size filtering, there are ", nrow(mat), " gene sets,\n containing a total of ", nrow(eset), " genes for analysis.")
 
+    if (tests == 'wilcox') {
+        message("Converting gene expression to ranks for Wilcoxon-Rank-Sum Test")
+        for (i in 1:nrow(eset)) eset[i, ] <- rank(eset[i, ])
+    }
+
     if (verbose) message("Obtaining observed gene set statistics.")
 
     if (tests == 'paired') obs <- rowPairedTtests(as.matrix(eset), fac, method)
-    else obs <- rowtests(as.matrix(eset), fac, method)
+    if (tests == 'multi') obs <- rowMultitests(as.matrix(eset), fac)
+    if (tests == 'wilcox') obs <- rowWilcoxTest(as.matrix(eset), fac, method)
+    if (tests == 'unpaired') obs <- rowtests(as.matrix(eset), fac, method)
 
     if (restandardize) {
         if (method == 'maxmean') {
@@ -184,7 +195,9 @@ GSALight <- function (eset, fac, gs, nperm = NULL, tests = c('unpaired','paired'
 
     if (nperm <= npermBreaks) {
         if (tests == 'paired') permMat <- GSApairedfunc(as.matrix(eset),fac,nperm,method)
-        else permMat <- GSAfunc(as.matrix(eset),fac,nperm,method)
+        if (tests == 'multi') permMat <- GSAMultifunc(as.matrix(eset), fac, nperm)
+        if (tests == 'wilcox') permMat <- GSAWilcoxFunc(as.matrix(eset), fac, nperm,method)
+        if (tests == 'unpaired') permMat <- GSAfunc(as.matrix(eset),fac,nperm,method)
         if (restandardize) {
             if (method == 'maxmean') {
                 meanStar1 <- colSums(permMat$resultsMat1*numCatGenes)/totCatGenes
@@ -226,6 +239,8 @@ GSALight <- function (eset, fac, gs, nperm = NULL, tests = c('unpaired','paired'
         for (i in 1:permBreaks) {
             if (verbose) message("Running batch ", i, " of ", permBreaks, " batches.")
             if (tests == 'paired') permMat <- GSApairedfunc(as.matrix(eset),fac,ifelse(i!=permBreaks,npermBreaks,nperm-{i-1}*npermBreaks),method)
+            if (tests == 'multi') permMat <- GSAMultifunc(as.matrix(eset),fac,ifelse(i!=permBreaks,npermBreaks,nperm-{i-1}*npermBreaks))
+            if (tests == 'wilcox') permMat <- GSAWilcoxFunc(as.matrix(eset), fac, ifelse(i!=permBreaks, npermBreaks, nperm-{i-1}*npermBreaks), method)
             else permMat <- GSAfunc(as.matrix(eset),fac,ifelse(i!=permBreaks,npermBreaks,nperm-{i-1}*npermBreaks),method)
             if (restandardize) {
                 if (method == 'maxmean') {
@@ -264,14 +279,14 @@ GSALight <- function (eset, fac, gs, nperm = NULL, tests = c('unpaired','paired'
     }
 
     if (verbose) message("Permutation done. Evaluating P-values.")
-    if (method == 'absmean') {
+    if (method == 'absmean' || tests == "multi") {
         pvals <- 1-pval
         qvals <- p.adjust(pvals,method='BH')
         results <- cbind(pvals,qvals,obsOrig,rowSums(mat))
         colnames(results) <- c('p-value','q-value','statistics','# genes')
     }
     else {
-        if (tests == 'unpaired') {
+        if (tests == 'unpaired' || tests == 'wilcox') {
             lvls <- levels(as.factor(fac))
             fac <- as.numeric(as.factor(fac))-1
             if (sum(fac==1) > sum(fac==0)) lvls <- rev(lvls)
@@ -444,3 +459,120 @@ wilcoxTest <- function(eset, fac, tests=c("unpaired","paired")) {
 
 }
 
+rowMultitests <- function(eset,fac) {
+
+    fac <- as.numeric(as.factor(fac))-1
+
+    #if (sum(fac==1) > sum(fac==0)) fac <- abs(fac - 1)
+
+    numPerClass <- table(fac)
+
+    totalMean <- rowMeans(eset)
+
+    classMean <- withinClassSS <- matrix(0, nrow(eset), length(numPerClass))
+
+    for (i in 0:(length(numPerClass)-1)) {
+        classMean[, i+1] <- rowMeans(eset[, fac == i])
+        withinClassSS[, i+1] <- rowSums((eset[, fac == i] - classMean[, i+1])^2)
+    }
+
+    numerMult <- length(fac)/prod(numPerClass)
+    denomMult <- sum(1/numPerClass)/sum(numPerClass-1)
+
+    numer <- sqrt(numerMult*colSums(t(classMean - totalMean)^2*as.vector(numPerClass)))
+    denom <- sqrt(denomMult*rowSums(withinClassSS))
+
+    numer/denom
+
+}
+
+GSAMultifunc <- function(eset, fac, nperm) {
+
+    # turn factor to numeric
+    fac <- as.numeric(as.factor(fac))-1
+
+    # get number of subject per class
+    numPerClass <- table(fac)
+    #numX <- sum(fac==1)
+    #numY <- sum(fac==0)
+
+    permMat <- fac%*%t(rep(1,nperm))
+    for (i in 1:nperm) permMat[,i] <- sample(permMat[,i])
+
+    permMat <- Matrix(permMat)
+
+    meanAll <- rowMeans(eset)
+
+    meanMatList <- vector("list", length(numPerClass))
+    meanMatList <- lapply(meanMatList, function (x) matrix(0, nrow(eset), nperm))
+
+    # SSWithinClass <- matrix(0, nrow(eset), nperm)
+    for (i in 0:(length(numPerClass)-1)) {
+
+        tmpPermMat <- Matrix(0, length(fac), nperm)
+        # tmpPermMat[permMat != i] <- 0
+        tmpPermMat[permMat == i] <- 1
+
+        meanMatList[[i+1]] <- (eset %*% tmpPermMat)/numPerClass[i+1]
+        if (i == 0) {
+            SSBetweenClass <- numPerClass[1]*(meanMatList[[1]] - meanAll)^2
+            SSWithinClass <- eset^2 %*% tmpPermMat - numPerClass[i+1]*meanMatList[[i+1]]^2
+        }
+        else {
+            SSBetweenClass <- SSBetweenClass + numPerClass[i+1]*(meanMatList[[i+1]] - meanAll)^2
+            SSWithinClass <- SSWithinClass + eset^2 %*% tmpPermMat - numPerClass[i+1]*meanMatList[[i+1]]^2
+        }
+    }
+
+    numerMult <- length(fac)/prod(numPerClass)
+    denomMult <- sum(1/numPerClass)/sum(numPerClass-1)
+
+    numer <- sqrt(numerMult*SSBetweenClass)
+    denom <- sqrt(denomMult*SSWithinClass)
+
+    numer/denom
+
+}
+
+rowWilcoxTest <- function(esetRank, fac, method = c('maxmean','mean','absmean')) {
+    fac <- as.numeric(as.factor(fac))-1
+    if (sum(fac==1) > sum(fac==0)) fac <- abs(fac - 1)
+    numX <- sum(fac==1)
+    numY <- sum(fac==0)
+    results <- esetRank%*%fac - numX*(numX + numY + 1)/2
+    results <- results/sqrt(numX*numY*(numX + numY + 1)/12)
+    if (method == 'mean') return( results )
+    else if (method == 'absmean') return( abs(results) )
+    else if (method == 'maxmean') {
+        results1 <- pmax(results,0)
+        results2 <- -pmin(results,0)
+        return(ls=list(results1=results1,results2=results2))
+    }
+}
+
+GSAWilcoxFunc <- function(esetRank, fac, nperm, method = c('maxmean','mean','absmean')) {
+
+    fac <- as.numeric(as.factor(fac))-1
+
+    if (sum(fac==1) > sum(fac==0)) fac <- abs(fac - 1)
+
+    numX <- sum(fac==1)
+    numY <- sum(fac==0)
+
+    permMat <- fac%*%t(rep(1,nperm))
+    for (i in 1:nperm) permMat[,i] <- sample(permMat[,i])
+
+    permMat <- Matrix(permMat)
+
+    resultsMat <- esetRank %*% permMat - numX*(numX + numY + 1)/2
+
+    resultsMat <- resultsMat/sqrt(numX*numY*(numX + numY + 1)/12)
+
+    if (method == 'mean') return(resultsMat)
+    else if (method == 'absmean') return( abs(resultsMat) )
+    else if (method == 'maxmean') {
+        resultsMat1 <- pmax(as.matrix(resultsMat),0)
+        resultsMat2 <- -pmin(as.matrix(resultsMat),0)
+        return(ls=list(resultsMat1=resultsMat1,resultsMat2=resultsMat2))
+    }
+}

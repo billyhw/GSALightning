@@ -2,9 +2,6 @@
 # library(githubinstall)
 # gh_install_packages("GSALighting", ref = "testing")
 
-# to run, type:
-# test_dir("tianLab/GSALightning/tests/testthat")
-
 library(samr)
 library(GSALightning)
 
@@ -38,6 +35,18 @@ test_that("Unpaired Test: Concordance of Statistics and p-values with SAM", {
 
   samrPVals <- samr.pvalues.from.perms(samr.obj$tt, samr.obj$ttstar)
   expect_gt(cor(samrPVals, matchPvals(GSAResult)), 0.98)
+
+})
+
+test_that("Wilcoxon Rank Sum Test: Concordance of Statistics and p-values with SAM", {
+
+  samr.obj<-samr(data, resp.type="Two class unpaired", nperms=200, testStatistic=c("wilcox"), s0.perc=-1)
+  GSAResult <- permTestLight(x, y, nperm = 200, tests = 'wilcox', method = 'mean')
+
+  expect_equivalent(GSAResult[,5], samr.obj$numer/(samr.obj$sd - samr.obj$s0))
+
+  samrPVals <- samr.pvalues.from.perms(samr.obj$tt, samr.obj$ttstar)
+  expect_gt(cor(samrPVals, matchPvals(GSAResult)), 0.95)
 
 })
 

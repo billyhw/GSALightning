@@ -2,9 +2,6 @@
 # library(githubinstall)
 # gh_install_packages("GSALighting", ref = "testing")
 
-# to run, type:
-# test_dir("tianLab/GSALightning/tests/testthat")
-
 library(GSA)
 library(GSALightning)
 
@@ -124,6 +121,27 @@ test_that("Paired-Test: Concordance of Gene set Statistics and p-values with GSA
     resp.type = "Two class paired", s0 = 0, s0.perc=-1, restand = FALSE)
 
   expect_equivalent(GSALightResult[,5], GSAResult$GSA.scores)
+  expect_gt(cor(GSALightResult[,1], GSAResult$pvalues.hi), 0.90)
+})
+
+y <- factor(c(rep(0,7),rep(1,7),rep(2,6)))
+yy <- factor(c(rep(1,7),rep(2,7),rep(3,6)))
+
+test_that("Multi-Test: Concordance of Gene set Statistics and p-values with GSA", {
+  GSALightResult <- GSALight(x, y, genesets, nperm = 200, tests = 'multi',
+    method = 'mean', restandardize = TRUE)
+  GSAResult <- GSA(x, yy, genesets, genenames, nperms=200, method = "mean",
+    resp.type = "Multiclass", s0 = 0, s0.perc=-1, restand = TRUE)
+
+  expect_equivalent(GSALightResult[,3], GSAResult$GSA.scores)
+  expect_gt(cor(GSALightResult[,1], GSAResult$pvalues.hi), 0.90)
+
+  GSALightResult <- GSALight(x, y, genesets, nperm = 200, tests = 'multi',
+    method = 'mean', restandardize = FALSE)
+  GSAResult <- GSA(x, yy, genesets, genenames, nperms=200, method = "mean",
+    resp.type = "Multiclass", s0 = 0, s0.perc=-1, restand = FALSE)
+
+  expect_equivalent(GSALightResult[,3], GSAResult$GSA.scores)
   expect_gt(cor(GSALightResult[,1], GSAResult$pvalues.hi), 0.90)
 })
 
