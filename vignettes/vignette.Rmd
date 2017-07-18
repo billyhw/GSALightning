@@ -48,7 +48,7 @@ This document begins with an installation and quick-start guide for users. This 
 We recommend installing GSA-Lightning using the R “devtools” package. To do this, install the R “devtools” package, and then in R type:
 
 ```{r eval = FALSE}
-library(devtools) 
+library(devtools)
 install_github("billyhw/GSALightning")
 ```
 
@@ -82,7 +82,7 @@ expression <- expression[apply(expression,1,sd) != 0,]
 The main function of GSALightning is GSALight(). Skipping the details for now, we will run GSALight using the most of the default settings, and look at the results:
 
 ```{r}
-GSALightResults <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes, 
+GSALightResults <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes,
 		   		   	       nperm = 1000, minsize = 10, rmGSGenes = 'gene')
 head(GSALightResults)
 ```
@@ -106,7 +106,7 @@ expression[1:4,1:3]
 
 _Note: The rows and columns of the expression data matrix must be names for GSALightning to work._
 
-The subject classes is a factor of classes for the subjects. 
+The subject classes is a factor of classes for the subjects.
 
 ```{r}
 data(sampleInfo)
@@ -128,13 +128,13 @@ _Advanced usage: alternatively, the gene sets can be a data.table, where the fir
 
 ## 4. GSALight()
 
-The main function of GSA-Lightning is GSALight(), which performs permutation-based gene set analysis. 
+The main function of GSA-Lightning is GSALight(), which performs permutation-based gene set analysis.
 
 ### 4.1 Preliminiary Data Check
 
 Prior to beginning the permutation, GSALight() will check for (1) if there are missing data in the expression data, (2) if any gene has zero sample variance, and (3) if there are genes in a gene set without expression measurements in the expression matrix. If any one of (1), (2), and (3) is true, GSALight() will return an error.
 
-Users are therefore recommended to ensure that missing data in the expression data is appropriately handled (e.g. through imputation) before running GSALight(). Also please ensure genes with zero (or small) sample variance are removed prior to running GSALight(). 
+Users are therefore recommended to ensure that missing data in the expression data is appropriately handled (e.g. through imputation) before running GSALight(). Also please ensure genes with zero (or small) sample variance are removed prior to running GSALight().
 
 To handle genes within gene sets with no expression measurements in the expression data, users can use the "rmGSGenes" argument. By setting "rmGSGenes = 'gene'", GSALight() will remove genes without expression measurement from the gene sets. Alternative, by setting "rmGSGenes = 'gs'", GSALight() will exclude gene sets with unmeasured genes entirely from the analysis.
 
@@ -158,7 +158,7 @@ GSALightResults <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs =
 We will remove the genes without expression measurements from those gene sets by setting "rmGSGenes = 'gene'". GSALight() will now run and finish the permutation:
 
 ```{r}
-GSALightResults <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes, 
+GSALightResults <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes,
 		   		   	       nperm = 1000, rmGSGenes = 'gene')
 head(GSALightResults)
 ```
@@ -167,8 +167,8 @@ head(GSALightResults)
 
 Below is a call to GSALight() where some commonly considered arguments are explicitly specified:
 ```{r}
-GSALightResults <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes, 
-		   		   	       nperm = 1000, method = 'maxmean', restandardize = FALSE, minsize = 10, 
+GSALightResults <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes,
+		   		   	       nperm = 1000, method = 'maxmean', restandardize = FALSE, minsize = 10,
 					       maxsize = 30, rmGSGenes = 'gene', verbose = FALSE)
 ```
 
@@ -201,16 +201,16 @@ GSALight() offers three ways to combine the individual gene statistics into a ge
 For example, to use the "mean" statistics, call:
 
 ```{r}
-GSALightResultsMean <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes, 
-		   		   	       nperm = 1000, method = 'mean', restandardize = FALSE, minsize = 10, 
+GSALightResultsMean <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes,
+		   		   	       nperm = 1000, method = 'mean', restandardize = FALSE, minsize = 10,
 					       maxsize = 30, rmGSGenes = 'gene', verbose = FALSE)
 ```
 
 To use the "absmean" statistics, call:
 
 ```{r}
-GSALightResultsAbs <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes, 
-		   		   	       nperm = 1000, method = 'absmean', restandardize = FALSE, minsize = 10, 
+GSALightResultsAbs <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes,
+		   		   	       nperm = 1000, method = 'absmean', restandardize = FALSE, minsize = 10,
 					       maxsize = 30, rmGSGenes = 'gene', verbose = FALSE)
 ```
 
@@ -241,13 +241,13 @@ In the previous function call, the number of permutations was set at 1000. In pr
 
 This number of permutations will suffice for accurate p-values estimation, when the significance level is set at 0.05, even after Bonferroni correction.
 
-We now run GSALight() using the default number of permutations. Here, we set "nperm" to NULL (alternatively, we may remove the "nperm" argument). In this case GSALight() will calculate the number of permutations using the formula above. Also to minimize outputs, we set "verbose" to FALSE to suppress outputs from GSALight(). 
+We now run GSALight() using the default number of permutations. Here, we set "nperm" to NULL (alternatively, we may remove the "nperm" argument). In this case GSALight() will calculate the number of permutations using the formula above. Also to minimize outputs, we set "verbose" to FALSE to suppress outputs from GSALight().
 
 _Caution: the following will take some time to run._
 
 ```{r}
-GSALightResults <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes, 
-		   		   	       nperm = NULL, method = 'maxmean', restandardize = FALSE, minsize = 10, 
+GSALightResults <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes,
+		   		   	       nperm = NULL, method = 'maxmean', restandardize = FALSE, minsize = 10,
 					       rmGSGenes = 'gene', verbose = FALSE)
 ```
 
@@ -266,8 +266,8 @@ From the histogram of the p-values, we observe that many gene sets have very sma
 GSALight() can perform the restandardization method of (Efron 2007) by setting the argument "restandardization" to "TRUE". We now run GSALight() with restandardization, and investigate the p-values distribution:
 
 ```{r}
-GSALightResultsReStand <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes, 
-		   		   	       nperm = NULL, method = 'maxmean', restandardize = TRUE, minsize = 10, 
+GSALightResultsReStand <- GSALight(eset = expression, fac = factor(sampleInfo$TN), gs = targetGenes,
+		   		   	       nperm = NULL, method = 'maxmean', restandardize = TRUE, minsize = 10,
 					       rmGSGenes = 'gene', verbose = FALSE)
 hist(GSALightResultsReStand[,'p-value:up-regulated in Control'], main=NULL, xlab='p-value')
 ```
@@ -296,15 +296,6 @@ As in GSALight(), a default number of permutations can be set by setting "nperm"
 
 _Note: The "maxmean" statistics is not defined for single gene testing, and hence is not available for permTestLight._
 
-### 5.2 Mann-Whitney U Test for Single Gene Testing
-In addition to permutation tests, the GSALightning package also offer the Mann-Whitney U test for single-gene testing. Briefly, Mann-Whitney U test is the non-parametric version of the independent t-test for two-sample problem. To perform the Mann-Whitney U test, call the wilcoxTest() function:
-
-```{r}
-singleWilcox <- wilcoxTest(eset = expression, fac = factor(sampleInfo$TN),
-		   		  	   	             tests = "unpaired")
-head(singleWilcox)
-```
-
 ### 5.3 Gene Set Analysis for Paired Design
 
 Thus far this guide has only covered independent two-sample tests. In fact, all main functions in GSALightning, i.e. GSALight(), permTestLight(), and wilcoxTest(), also support paired two-sample test.
@@ -322,8 +313,8 @@ Notice how the classes are defined for paired-tests: the classes vector must be 
 
 To use GSALight() to perform paired-test, set the "tests" argument to 'paired':
 ```{r}
-GSALightResultsPaired <- GSALight(eset = expression, fac = fac, gs = targetGenes, 
-		   		   	       nperm = 1000, tests = 'paired', method = 'maxmean', restandardize = TRUE, minsize = 10, 
+GSALightResultsPaired <- GSALight(eset = expression, fac = fac, gs = targetGenes,
+		   		   	       nperm = 1000, tests = 'paired', method = 'maxmean', restandardize = TRUE, minsize = 10,
 					       rmGSGenes = 'gene', verbose = FALSE)
 head(GSALightResultsPaired)
 ```

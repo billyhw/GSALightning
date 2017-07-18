@@ -2,6 +2,8 @@
 # library(githubinstall)
 # gh_install_packages("GSALighting", ref = "testing")
 
+# to check coverage use package_coverage() in package "covr"
+
 library(GSA)
 library(GSALightning)
 
@@ -20,6 +22,24 @@ for(i in 1:50){
  genesets[[i]]=paste("g",sample(1:1000,size=30),sep="")
 }
 names(genesets)=paste("set",as.character(1:50),sep="")
+
+test_that("Unsure npermBreaks won't change results", {
+  GSALightResult <- GSALight(x, y, genesets, nperm = 200, tests = 'unpaired',
+    method = 'mean', restandardize = TRUE, npermBreaks = 19)
+  GSAResult <- GSA(x, yy, genesets, genenames, nperms=200, method = "mean",
+    resp.type = "Two class unpaired", s0 = 0, s0.perc=-1, restand = TRUE)
+
+  expect_equivalent(GSALightResult[,5], GSAResult$GSA.scores)
+  expect_gt(cor(GSALightResult[,2], GSAResult$pvalues.hi), 0.90)
+
+  GSALightResult <- GSALight(x, y, genesets, nperm = 200, tests = 'unpaired',
+    method = 'mean', restandardize = FALSE)
+  GSAResult <- GSA(x, yy, genesets, genenames, nperms=200, method = "mean",
+    resp.type = "Two class unpaired", s0 = 0, s0.perc=-1, restand = FALSE)
+
+  expect_equivalent(GSALightResult[,5], GSAResult$GSA.scores)
+  expect_gt(cor(GSALightResult[,2], GSAResult$pvalues.hi), 0.90)
+})
 
 test_that("Unpaired Test: Concordance of Gene set Statistics and p-values with GSA", {
   GSALightResult <- GSALight(x, y, genesets, nperm = 200, tests = 'unpaired',

@@ -413,52 +413,6 @@ dataTable2Mat <- function(gsTable) {
     mat[origOrder,]
 }
 
-wilcoxTest <- function(eset, fac, tests=c("unpaired","paired")) {
-
-    eset <- as.data.frame(t(eset))
-    facn <- as.numeric(as.factor(fac))-1
-    if (tests == 'unpaired') wilcoxFunc <- function(xx) wilcox.test(x=xx[facn==0],y=xx[facn==1],alternative="greater")$p.value
-    else if (tests == 'paired') {
-        wilcoxFunc <- function(xx) {
-            xxx <- xx[fac >= 1]
-            yy <- xx[fac <= -1]
-            fx <- fac[fac >= 1]
-            fy <- -fac[fac <= -1]
-            wilcox.test(x = xxx[order(fx)], y = yy[order(fy)], paired=TRUE, alternative="greater")$p.value
-        }
-    }
-    pval <- sapply(eset,wilcoxFunc)
-
-    if (tests == 'unpaired') {
-        lvls <- levels(as.factor(fac))
-
-        pvals <- cbind(pval,1-pval)
-        colnames(pvals) <- c(paste('up-regulated in', lvls[1]), paste('up-regulated in',lvls[2]))
-        rownames(pvals) <- colnames(eset)
-
-        qvals <- cbind(p.adjust(pvals[,1],'BH'),p.adjust(pvals[,2],'BH'))
-
-        results <- cbind(pvals,qvals)
-        colnames(results) <- c(paste('p-value:up-regulated in', lvls[1]), paste('p-value:up-regulated in',lvls[2]),
-                               paste('q-value:up-regulated in', lvls[1]), paste('q-value:up-regulated in',lvls[2]))
-    }
-
-    else if (tests == "paired") {
-        pvals <- cbind(pval,1-pval)
-        colnames(pvals) <- c(paste('up-regulated in', 'positives'), paste('up-regulated in','negatives'))
-        rownames(pvals) <- colnames(eset)
-
-        qvals <- cbind(p.adjust(pvals[,1],'BH'),p.adjust(pvals[,2],'BH'))
-
-        results <- cbind(pvals,qvals)
-        colnames(results) <- c(paste('p-value:up-regulated in', 'positives'), paste('p-value:up-regulated in','negatives'),
-                               paste('q-value:up-regulated in', 'positives'), paste('q-value:up-regulated in','negatives'))
-    }
-
-    results
-
-}
-
 rowMultitests <- function(eset,fac) {
 
     fac <- as.numeric(as.factor(fac))-1
