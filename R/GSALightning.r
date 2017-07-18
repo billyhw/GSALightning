@@ -142,24 +142,13 @@ GSALight <- function (eset, fac, gs, nperm = NULL, tests = c('unpaired','paired'
     if (tests == 'unpaired') obs <- rowtests(as.matrix(eset), fac, method)
 
     if (restandardize) {
+        numCatGenes <- colSums(mat)
+        totCatGenes <- sum(numCatGenes)
         if (method == 'maxmean') {
-            numCatGenes <- colSums(mat)
-            totCatGenes <- sum(numCatGenes)
             meanobs1 <- sum(obs$results1*numCatGenes)/totCatGenes
             sdobs1 <- sqrt({sum(numCatGenes*{obs$results1^2}) - totCatGenes*meanobs1^2}/(totCatGenes - 1))
             meanobs2 <- sum(obs$results2*numCatGenes)/totCatGenes
             sdobs2 <- sqrt({sum(numCatGenes*{obs$results2^2}) - totCatGenes*meanobs2^2}/(totCatGenes - 1))
-        }
-        else {
-            numCatGenes <- colSums(mat)
-            totCatGenes <- sum(numCatGenes)
-            meanobs <- sum(obs*numCatGenes)/totCatGenes
-            sdobs <- sqrt({sum(numCatGenes*{obs^2}) - totCatGenes*meanobs^2}/(totCatGenes - 1))
-        }
-    }
-
-    if (restandardize) {
-        if (method == 'maxmean') {
             obs1 <- as.vector(mat %*% obs$results1)
             obs2 <- as.vector(mat %*% obs$results2)
             obs1 <- obsOrig1 <- (obs1/numGenes - meanobs1)/sdobs1
@@ -168,8 +157,10 @@ GSALight <- function (eset, fac, gs, nperm = NULL, tests = c('unpaired','paired'
             obs[obs2 > obs1] <- -1*obs[obs2 > obs1]
             obsOrig <- pmax(obsOrig1,obsOrig2)
             obsOrig[obsOrig2 > obsOrig1] <- -1*obsOrig[obsOrig2 > obsOrig1]
-            }
+        }
         else {
+            meanobs <- sum(obs*numCatGenes)/totCatGenes
+            sdobs <- sqrt({sum(numCatGenes*{obs^2}) - totCatGenes*meanobs^2}/(totCatGenes - 1))
             obs <- mat %*% obs
             obs <- as.vector(obs)
             obs <- obsOrig <- (obs/numGenes - meanobs)/sdobs*sqrt(numGenes)
@@ -198,37 +189,8 @@ GSALight <- function (eset, fac, gs, nperm = NULL, tests = c('unpaired','paired'
         if (tests == 'multi') permMat <- GSAMultifunc(as.matrix(eset), fac, nperm)
         if (tests == 'wilcox') permMat <- GSAWilcoxFunc(as.matrix(eset), fac, nperm,method)
         if (tests == 'unpaired') permMat <- GSAfunc(as.matrix(eset),fac,nperm,method)
-        if (restandardize) {
-            if (method == 'maxmean') {
-                meanStar1 <- colSums(permMat$resultsMat1*numCatGenes)/totCatGenes
-                sdStar1 <- sqrt((colSums({permMat$resultsMat1^2}*numCatGenes) - totCatGenes*meanStar1^2)/(totCatGenes - 1))
-                permMat1 <- as.matrix(mat%*%permMat$resultsMat1)
-                permMat1 <- t((t(permMat1/numGenes) - meanStar1)/sdStar1)
-
-                meanStar2 <- colSums(permMat$resultsMat2*numCatGenes)/totCatGenes
-                sdStar2 <- sqrt((colSums({permMat$resultsMat2^2}*numCatGenes) - totCatGenes*meanStar2^2)/(totCatGenes - 1))
-                permMat2 <- as.matrix(mat%*%permMat$resultsMat2)
-                permMat2 <- t((t(permMat2/numGenes) - meanStar2)/sdStar2)
-
-                permMat <- pmax(permMat1, permMat2)
-                permMat[permMat2 > permMat1] <- -1 * permMat[permMat2 > permMat1]
-            }
-            else {
-                meanStar <- colSums(permMat*numCatGenes)/totCatGenes
-                sdStar <- sqrt((colSums({permMat^2}*numCatGenes) - totCatGenes*meanStar^2)/(totCatGenes - 1))
-                permMat <- as.matrix(mat%*%permMat)
-                permMat <- t((t(permMat/numGenes) - meanStar)/sdStar)*sqrt(numGenes)
-            }
-        }
-        else {
-            if (method == 'maxmean') {
-                permMat1 <- as.matrix(mat%*%permMat$resultsMat1)
-                permMat2 <- as.matrix(mat%*%permMat$resultsMat2)
-                permMat <- pmax(permMat1, permMat2)
-                permMat[permMat2 > permMat1] <- -1 * permMat[permMat2 > permMat1]
-            }
-            else permMat <- as.matrix(mat%*%permMat)
-        }
+        if (restandardize) permMat <- getGeneSetPermStats(restandardize, method, permMat, mat, numCatGenes, totCatGenes, numGenes)
+        else permMat <- getGeneSetPermStats(restandardize, method, permMat, mat)
         pvalSums <- pvalFromPermMat(obs, permMat)
         pval <- pvalSums/nperm
     }
@@ -241,38 +203,9 @@ GSALight <- function (eset, fac, gs, nperm = NULL, tests = c('unpaired','paired'
             if (tests == 'paired') permMat <- GSApairedfunc(as.matrix(eset),fac,ifelse(i!=permBreaks,npermBreaks,nperm-{i-1}*npermBreaks),method)
             if (tests == 'multi') permMat <- GSAMultifunc(as.matrix(eset),fac,ifelse(i!=permBreaks,npermBreaks,nperm-{i-1}*npermBreaks))
             if (tests == 'wilcox') permMat <- GSAWilcoxFunc(as.matrix(eset), fac, ifelse(i!=permBreaks, npermBreaks, nperm-{i-1}*npermBreaks), method)
-            else permMat <- GSAfunc(as.matrix(eset),fac,ifelse(i!=permBreaks,npermBreaks,nperm-{i-1}*npermBreaks),method)
-            if (restandardize) {
-                if (method == 'maxmean') {
-                    meanStar1 <- colSums(permMat$resultsMat1*numCatGenes)/totCatGenes
-                    sdStar1 <- sqrt((colSums({permMat$resultsMat1^2}*numCatGenes) - totCatGenes*meanStar1^2)/(totCatGenes - 1))
-                    permMat1 <- as.matrix(mat%*%permMat$resultsMat1)
-                    permMat1 <- t((t(permMat1/numGenes) - meanStar1)/sdStar1)
-
-                    meanStar2 <- colSums(permMat$resultsMat2*numCatGenes)/totCatGenes
-                    sdStar2 <- sqrt((colSums({permMat$resultsMat2^2}*numCatGenes) - totCatGenes*meanStar2^2)/(totCatGenes - 1))
-                    permMat2 <- as.matrix(mat%*%permMat$resultsMat2)
-                    permMat2 <- t((t(permMat2/numGenes) - meanStar2)/sdStar2)
-
-                    permMat <- pmax(permMat1, permMat2)
-                    permMat[permMat2 > permMat1] <- -1 * permMat[permMat2 > permMat1]
-                }
-                else {
-                    meanStar <- colSums(permMat*numCatGenes)/totCatGenes
-                    sdStar <- sqrt((colSums({permMat^2}*numCatGenes) - totCatGenes*meanStar^2)/(totCatGenes - 1))
-                    permMat <- as.matrix(mat%*%permMat)
-                    permMat <- t((t(permMat/numGenes) - meanStar)/sdStar)*sqrt(numGenes)
-                }
-            }
-            else {
-                if (method == 'maxmean') {
-                    permMat1 <- as.matrix(mat%*%permMat$resultsMat1)
-                    permMat2 <- as.matrix(mat%*%permMat$resultsMat2)
-                    permMat <- pmax(permMat1, permMat2)
-                    permMat[permMat2 > permMat1] <- -1 * permMat[permMat2 > permMat1]
-                }
-                else permMat <- as.matrix(mat%*%permMat)
-            }
+            if (tests == 'unpaired') permMat <- GSAfunc(as.matrix(eset),fac,ifelse(i!=permBreaks,npermBreaks,nperm-{i-1}*npermBreaks),method)
+            if (restandardize) permMat <- getGeneSetPermStats(restandardize, method, permMat, mat, numCatGenes, totCatGenes, numGenes)
+            else permMat <- getGeneSetPermStats(restandardize, method, permMat, mat)
             pvalSums <- pvalSums + pvalFromPermMat(obs, permMat)
         }
         pval <- pvalSums/nperm
@@ -314,6 +247,41 @@ GSALight <- function (eset, fac, gs, nperm = NULL, tests = c('unpaired','paired'
 
     as.data.frame(results)
 
+}
+
+getGeneSetPermStats <- function(restandardize, method, permMat, mat, numCatGenes=NULL, totCatGenes=NULL, numGenes=NULL) {
+    if (restandardize) {
+        if (method == 'maxmean') {
+            meanStar1 <- colSums(permMat$resultsMat1*numCatGenes)/totCatGenes
+            sdStar1 <- sqrt((colSums({permMat$resultsMat1^2}*numCatGenes) - totCatGenes*meanStar1^2)/(totCatGenes - 1))
+            permMat1 <- as.matrix(mat%*%permMat$resultsMat1)
+            permMat1 <- t((t(permMat1/numGenes) - meanStar1)/sdStar1)
+
+            meanStar2 <- colSums(permMat$resultsMat2*numCatGenes)/totCatGenes
+            sdStar2 <- sqrt((colSums({permMat$resultsMat2^2}*numCatGenes) - totCatGenes*meanStar2^2)/(totCatGenes - 1))
+            permMat2 <- as.matrix(mat%*%permMat$resultsMat2)
+            permMat2 <- t((t(permMat2/numGenes) - meanStar2)/sdStar2)
+
+            permMat <- pmax(permMat1, permMat2)
+            permMat[permMat2 > permMat1] <- -1 * permMat[permMat2 > permMat1]
+        }
+        else {
+            meanStar <- colSums(permMat*numCatGenes)/totCatGenes
+            sdStar <- sqrt((colSums({permMat^2}*numCatGenes) - totCatGenes*meanStar^2)/(totCatGenes - 1))
+            permMat <- as.matrix(mat%*%permMat)
+            permMat <- t((t(permMat/numGenes) - meanStar)/sdStar)*sqrt(numGenes)
+        }
+    }
+    else {
+        if (method == 'maxmean') {
+            permMat1 <- as.matrix(mat%*%permMat$resultsMat1)
+            permMat2 <- as.matrix(mat%*%permMat$resultsMat2)
+            permMat <- pmax(permMat1, permMat2)
+            permMat[permMat2 > permMat1] <- -1 * permMat[permMat2 > permMat1]
+        }
+        else permMat <- as.matrix(mat%*%permMat)
+    }
+    permMat
 }
 
 rowtests <- function(eset,fac,method=c('maxmean','mean','absmean')) {
