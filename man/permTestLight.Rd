@@ -8,7 +8,7 @@ Fast Single-Gene Permutation Test
 A fast permutation-testing procedure for two-sample single-gene differential expression analysis.
 }
 \usage{
-permTestLight(eset, fac, nperm, tests = c('unpaired','paired'), method = c("mean", "absmean"), 
+permTestLight(eset, fac, nperm, tests = c('unpaired','paired','multi','wilcox'), method = c("mean", "absmean"),
 	      npermBreaks = 2000, verbose = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
