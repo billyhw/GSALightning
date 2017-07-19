@@ -1,5 +1,5 @@
 export(GSALight, permTestLight)
 
-import(Matrix, data.table, GSA, samr)
+import(Matrix, data.table)
 
 importFrom("stats", "p.adjust", "rbinom", "var")
