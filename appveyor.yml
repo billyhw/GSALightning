@@ -15,11 +15,21 @@ cache:
 
 # Adapt as necessary starting from here
 
+environment:
+  global:
+    WARNINGS_ARE_ERRORS: 1
+
 build_script:
   - travis-tool.sh install_deps
 
 test_script:
   - travis-tool.sh run_tests
+
+r_packages:
+  - GSA
+  - samr
+
+r_build_args: --no-manual --resave-data
 
 on_failure:
   - 7z a failure.zip *.Rcheck\*
