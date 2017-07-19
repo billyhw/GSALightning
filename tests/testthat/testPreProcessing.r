@@ -22,9 +22,11 @@ for(i in 1:50){
 }
 names(genesets)=paste("set",as.character(1:50),sep="")
 
-test_that("Unpaired test only accept 2-classes", {
+test_that("Unpaired test and Wilcox Rank Sum test only accept 2-classes", {
   expect_error(GSALight(x, yyy, genesets),
-    "More than two classes detected. GSALightning only supports two-sample t-tests.")
+    "More than two classes detected. For tests = 'unpaired' or 'wilcox' only two-sample tests are supported.")
+  expect_error(GSALight(x, yyy, genesets, tests = "wilcox"),
+    "More than two classes detected. For tests = 'unpaired' or 'wilcox' only two-sample tests are supported.")
 })
 
 test_that("Ensure paired-test class-labels correctness", {
@@ -84,20 +86,6 @@ test_that("Genes with 0 sample variance", {
   expect_error(GSALight(badX, y, genesets),
     "Some genes has 0 sample variance, please remove those genes prior to running GSALightning. Also consider removing genes with small sample variance.")
   })
-
-    # if (! all(colnames(mat) %in% rownames(eset))) {
-    #     if (rmGSGenes == 'gene') {
-    #         if (verbose) message("Some genes within the gene sets are not contained in the expression data set.\n These genes are removed from the gene sets since rmGSGenes == 'gene'.")
-    #         mat <- mat[,colnames(mat) %in% rownames(eset)]
-    #     }
-    #     else if (rmGSGenes == 'gs') {
-    #         if (verbose) message("Some genes within the gene sets are not contained in the expression data set.\n Gene sets with missing genes are removed since rmGSGenes == 'gs'.")
-    #         numGenes <- rowSums(mat)
-    #         newNumGenes <- rowSums(mat[,colnames(mat) %in% rownames(eset)])
-    #         mat <- mat[numGenes == newNumGenes,]
-    #     }
-    #     else stop("Some genes within the gene sets are not contained in the expression data set.\n Set rmGSGenes = 'gene' or 'gs' to remove respectively the missing genes or gene sets.")
-    # }
 
 test_that("Error of gene sets contain genes not in expression set", {
   badGenesets = genesets

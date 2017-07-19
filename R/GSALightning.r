@@ -77,9 +77,9 @@ GSALight <- function (eset, fac, gs, nperm = NULL, tests = c('unpaired','paired'
         if (!all(sortedfac == c(1:(length(fac)/2)))) stop("Some values in fac are skipped. For paired t-tests, the numbering of the subject pairs must be 1,2,3,... and -1,-2,-3,... with no skipped integers.")
     }
 
-    if (tests == 'unpaired') {
+    if (tests == 'unpaired' | tests == 'wilcox') {
         if (! is.factor(fac)) fac <- as.factor(fac)
-        if (length(unique(fac)) > 2 ) stop("More than two classes detected. GSALightning only supports two-sample t-tests.")
+        if (length(unique(fac)) > 2 ) stop("More than two classes detected. For tests = 'unpaired' or 'wilcox' only two-sample tests are supported.")
     }
 
     if (tests == 'multi') {
