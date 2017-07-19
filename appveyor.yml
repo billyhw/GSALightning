@@ -21,13 +21,13 @@ environment:
 
 build_script:
   - travis-tool.sh install_deps
+  - travis-tool.sh install_r GSA
+  - travis-tool.sh install_r samr
 
 test_script:
   - travis-tool.sh run_tests
 
-r_packages:
-  - GSA
-  - samr
+
 
 r_build_args: --no-manual --resave-data
 
