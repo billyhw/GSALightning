@@ -18,6 +18,7 @@ cache:
 environment:
   global:
     WARNINGS_ARE_ERRORS: 1
+    R_BUILD_ARGS: "--no-manual --resave-data"
 
 build_script:
   - travis-tool.sh install_deps
@@ -29,7 +30,7 @@ test_script:
 
 env:
   global:
-    - R_BUILD_ARGS="--no-manual --resave-data"
+
 
 on_failure:
   - 7z a failure.zip *.Rcheck\*
