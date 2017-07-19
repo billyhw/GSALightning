@@ -27,9 +27,9 @@ build_script:
 test_script:
   - travis-tool.sh run_tests
 
-
-
-r_build_args: --no-manual --resave-data
+env:
+  global:
+    - R_BUILD_ARGS="--no-manual --resave-data"
 
 on_failure:
   - 7z a failure.zip *.Rcheck\*
