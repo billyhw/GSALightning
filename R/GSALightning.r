@@ -50,7 +50,7 @@ permTestLight <- function(eset, fac, nperm, tests = c('unpaired','paired','multi
     mat <- Diagonal(nrow(eset),1)
     rownames(mat) <- colnames(mat) <- rownames(eset)
 
-    message("Note that permTestLight() simply runs GSALight() by treating each individual gene as a gene set.")
+    # message("Note that permTestLight() simply runs GSALight() by treating each individual gene as a gene set.")
 
     results <- GSALight(eset, fac, mat, nperm, tests, method, restandardize = FALSE, npermBreaks=npermBreaks, verbose = verbose)
     results <- results[,-ncol(results)]
@@ -69,17 +69,17 @@ GSALight <- function (eset, fac, gs, nperm = NULL, tests = c('unpaired','paired'
     rmGSGenes <- match.arg(rmGSGenes)
 
     if (tests == 'paired') {
-        if (! is.integer(fac)) stop(" For paired t-test, fac must be an integer vector.")
-        if (any(fac == 0)) stop(" For paired t-test, 0 is not allowed for subject pair index.")
+        if (! class(fac) %in% c("numeric", "integer")) stop("For paired t-test, fac must be an integer vector.")
+        if (any(fac == 0)) stop("For paired t-test, 0 is not allowed for subject pair index.")
         tab <- table(abs(fac))
-        if (any(tab != 2) | sum(fac > 0) != sum(fac < 0)) stop(" Some values in fac are not paired. For paired t-tests, fac must be a vector of 1,-1,2,-2,..., where each number represents a pair, and the sign represents the conditions. ")
+        if (any(tab != 2) | sum(fac > 0) != sum(fac < 0)) stop("Some values in fac are not paired. For paired t-tests, fac must be a vector of 1,-1,2,-2,..., where each number represents a pair, and the sign represents the conditions.")
         sortedfac <- sort(unique(abs(fac)))
-        if (!all(sortedfac == c(1:(length(fac)/2)))) stop(" Some values in fac are skipped. For paired t-tests, the numbering of the subject pairs must be 1,2,3,..., with no skipped integers. ")
+        if (!all(sortedfac == c(1:(length(fac)/2)))) stop("Some values in fac are skipped. For paired t-tests, the numbering of the subject pairs must be 1,2,3,... and -1,-2,-3,... with no skipped integers.")
     }
 
     if (tests == 'unpaired') {
         if (! is.factor(fac)) fac <- as.factor(fac)
-        if (length(unique(fac)) > 2 ) stop("more than two classes detected. GSALightning only supports two-sample t-tests.")
+        if (length(unique(fac)) > 2 ) stop("More than two classes detected. GSALightning only supports two-sample t-tests.")
     }
 
     if (tests == 'multi') {

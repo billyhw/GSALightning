@@ -5,7 +5,6 @@
 # to check coverage use package_coverage() in package "covr"
 
 library(GSA)
-library(GSALightning)
 
 set.seed(100)
 x <- matrix(rnorm(1000*20),ncol=20)

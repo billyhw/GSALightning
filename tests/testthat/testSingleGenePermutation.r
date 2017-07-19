@@ -3,7 +3,6 @@
 # gh_install_packages("GSALighting", ref = "testing")
 
 library(samr)
-library(GSALightning)
 
 set.seed(100)
 x <- matrix(rnorm(1000*20),ncol=20)
