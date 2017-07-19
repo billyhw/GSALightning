@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/billyhw/GSALightning.svg?branch=master)](https://travis-ci.org/billyhw/GSALightning)
+
 ## Motivation
 
 GSA-Lightning is an R package that provides a fast implementation of permutation-based gene set
@@ -9,7 +11,7 @@ is necessary for more accurate p-values estimation.
 
 GSA-Lightning requires R 3.3.0 or above (https://www.r-project.org/).
 
-We recommend using the R "devtools" package to install GSALightning from Github. 
+We recommend using the R "devtools" package to install GSALightning from Github.
 
 To install devtools, in an R prompt type:
 
@@ -28,7 +30,7 @@ Since the package contains some large example gene expression data sets, the dow
 If the R vignette is also desired, use instead:
 
 ```{r}
-library(devtools) 
+library(devtools)
 install_github("billyhw/GSALightning", build_vignette = TRUE)
 ```
 
