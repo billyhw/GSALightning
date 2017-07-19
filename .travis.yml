@@ -3,6 +3,7 @@ r:
   - bioc-devel
   - bioc-release
 sudo: false
+warnings_are_errors: false
 cache: packages
 
 r_build_args: --no-build-vignettes --no-manual --resave-data
