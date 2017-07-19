@@ -57,3 +57,14 @@ Added Github URL.
 Version 1.1.6
 
 Fixed default settings of permTestLight() by adding match.args and setting nperm=NULL.
+
+Version 1.1.7
+
+Results preserved the original order of gene sets from the input list of gene sets
+Results is now a data.frame
+Removed function wilcoxTest()
+Added testthat scripts
+Added "wilcox" and "multi" tests
+Manuals, vignettes, DESCRIPTION, and NAMESPACE updated according to the changes
+
+

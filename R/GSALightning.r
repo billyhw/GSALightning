@@ -50,8 +50,6 @@ permTestLight <- function(eset, fac, nperm, tests = c('unpaired','paired','multi
     mat <- Diagonal(nrow(eset),1)
     rownames(mat) <- colnames(mat) <- rownames(eset)
 
-    # message("Note that permTestLight() simply runs GSALight() by treating each individual gene as a gene set.")
-
     results <- GSALight(eset, fac, mat, nperm, tests, method, restandardize = FALSE, npermBreaks=npermBreaks, verbose = verbose)
     results <- results[,-ncol(results)]
 
@@ -385,8 +383,6 @@ rowMultitests <- function(eset,fac) {
 
     fac <- as.numeric(as.factor(fac))-1
 
-    #if (sum(fac==1) > sum(fac==0)) fac <- abs(fac - 1)
-
     numPerClass <- table(fac)
 
     totalMean <- rowMeans(eset)
@@ -410,13 +406,9 @@ rowMultitests <- function(eset,fac) {
 
 GSAMultifunc <- function(eset, fac, nperm) {
 
-    # turn factor to numeric
     fac <- as.numeric(as.factor(fac))-1
 
-    # get number of subject per class
     numPerClass <- table(fac)
-    #numX <- sum(fac==1)
-    #numY <- sum(fac==0)
 
     permMat <- fac%*%t(rep(1,nperm))
     for (i in 1:nperm) permMat[,i] <- sample(permMat[,i])
@@ -428,11 +420,9 @@ GSAMultifunc <- function(eset, fac, nperm) {
     meanMatList <- vector("list", length(numPerClass))
     meanMatList <- lapply(meanMatList, function (x) matrix(0, nrow(eset), nperm))
 
-    # SSWithinClass <- matrix(0, nrow(eset), nperm)
     for (i in 0:(length(numPerClass)-1)) {
 
         tmpPermMat <- Matrix(0, length(fac), nperm)
-        # tmpPermMat[permMat != i] <- 0
         tmpPermMat[permMat == i] <- 1
 
         meanMatList[[i+1]] <- (eset %*% tmpPermMat)/numPerClass[i+1]
