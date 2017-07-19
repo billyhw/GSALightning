@@ -1,6 +1,11 @@
-language: r
+language: R
 r:
   - bioc-devel
   - bioc-release
-
+sudo: false
 cache: packages
+
+r_check_args: "--no-build-vignettes"
+
+after_success:
+  - Rscript -e 'covr::codecov()'
