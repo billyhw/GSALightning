@@ -5,7 +5,8 @@ r:
 sudo: false
 cache: packages
 
-r_check_args: "--no-build-vignettes"
+r_build_args: --no-build-vignettes --no-manual --no-resave-data
+r_check_args: --no-build-vignettes --no-manual
 
 after_success:
   - Rscript -e 'covr::codecov()'
