@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/billyhw/GSALightning.svg?branch=master)](https://travis-ci.org/billyhw/GSALightning)
+[![Build status](https://ci.appveyor.com/api/projects/status/dtokc1ms18i0c020/branch/master?svg=true)](https://ci.appveyor.com/project/billyhw/gsalightning/branch/master)
 [![codecov](https://codecov.io/gh/billyhw/GSALightning/branch/master/graph/badge.svg)](https://codecov.io/gh/billyhw/GSALightning)
 
 ## Motivation
