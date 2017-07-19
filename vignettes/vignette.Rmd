@@ -298,7 +298,7 @@ _Note: The "maxmean" statistics is not defined for single gene testing, and henc
 
 ### 5.3 Gene Set Analysis for Paired Design
 
-Thus far this guide has only covered independent two-sample tests. In fact, all main functions in GSALightning, i.e. GSALight(), permTestLight(), and wilcoxTest(), also support paired two-sample test.
+Thus far this guide has only covered independent two-sample tests. In fact, all main functions in GSALightning, i.e. GSALight() and permTestLight(), also support paired two-sample test, multi-class comparisons, and Wilcoxon-rank-sum tests.
 
 To illustrate, this example uses GSALight() to perform paired-test. We will set up a set synthetic classes:
 

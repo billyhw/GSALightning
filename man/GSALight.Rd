@@ -8,7 +8,7 @@ Fast Permutation-based Gene Set Analysis
 GSALight is a fast implementation of two-sample permutation-based gene set analysis. It supports the mean or absolute mean version of the permutation T-test as implemeneted in the GSA package. Restandardization is also supported.
 }
 \usage{
-GSALight(eset, fac, gs, nperm = NULL, tests = c('unpaired','paired'), method = c("maxmean","mean", "absmean"), 
+GSALight(eset, fac, gs, nperm = NULL, tests = c('unpaired','paired','multi','wilcox'), method = c("maxmean","mean", "absmean"),
 	 minsize = 1, maxsize = Inf, restandardize = TRUE,
 	 npermBreaks = 2000, rmGSGenes = c('stop', 'gene', 'gs'), verbose = TRUE)
 }
@@ -18,16 +18,16 @@ GSALight(eset, fac, gs, nperm = NULL, tests = c('unpaired','paired'), method = c
 The expression matrix. Each row is a gene, and each column is a subject/sample. The gene names must be presented as the row names.
 }
   \item{fac}{
-Subject labels, for unpaired T-test, either a factor or something that can be coerced into a factor (e.g. 0 and 1, Experiment and Control). For paired T-test,  fac must be an integer vector of 1,-1,2,-2,..., where each number represents a pair, and the sign represents the conditions.
+Subject labels, for unpaired T-test (tests = "unpaired") or Wilcoxon-rank-sum tests (tests = "wilcox"), either a factor or something that can be coerced into a factor (e.g. 0 and 1, Experiment and Control). For paired T-test (tests = "paired"),  fac must be an integer vector of 1,-1,2,-2,..., where each number represents a pair, and the sign represents the conditions. For mutli-class test (tests = "multi"), fac is a factor with multiple levels.
 }
   \item{gs}{
-The gene sets. Most commonly, gs is a list, where each element (named after the gene set) is a vector of genes belonging to the gene set. It can also be a binary sparse matrix, where each row is a gene set, and each column is a gene. For each row (i.e. a gene set), the row entry is 1 if the corresponding gene belongs to the gene set, and 0 otherwise. Alternatively it can be a data table, where the first column (must be named "geneSet") contains the names of the gene set, and the second column (must be named "gene") are the gene set genes. 
+The gene sets. Most commonly, gs is a list, where each element (named after the gene set) is a vector of genes belonging to the gene set. It can also be a binary sparse matrix, where each row is a gene set, and each column is a gene. For each row (i.e. a gene set), the row entry is 1 if the corresponding gene belongs to the gene set, and 0 otherwise. Alternatively it can be a data table, where the first column (must be named "geneSet") contains the names of the gene set, and the second column (must be named "gene") are the gene set genes.
 }
   \item{nperm}{
 Number of permutations. If unspecified, nperm will be set as the total number of gene sets divided by 0.05 times 2. This should be sufficient to estimate accurate p-values for Bonferroni Correction under significance level alpha = 0.05.
 }
   \item{tests}{
-The tests to performed. Can be either the default "unpaired" for unpaired T-tests or "paired" for paired T-tests.
+The tests to performed. The default is "unpaired" for unpaired T-tests. Other options are, "paired" for paired T-tests, "multi" for multi-class comparisons, and "wilcox" for unpaired 2-class Wilcoxon-rank-sum tests.
 }
   \item{method}{
 The method to combine the T-test statistics for each individual gene into a gene set test statistics. The default "maxmean" uses the maxmean statistics proposed by Efron (2007). Other options are "mean", i.e. the mean of the statistics of the genes inside a gene set, and "absmean", the mean of the absolute value of the statistics.
