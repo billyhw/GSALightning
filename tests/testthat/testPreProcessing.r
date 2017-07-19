@@ -118,7 +118,7 @@ test_that("Remove gene sets containing genes not in expression set (rmGSGenes = 
 test_that("Remove genes not in expression set from gene sets (rmGSGenes = 'gene')", {
   badX = x
   badX = badX[-1,]
-  expect_message(GSALight(x, y, badGenesets, rmGSGenes = "gene"),
+  expect_message(GSALight(badX, y, genesets, rmGSGenes = "gene"),
     "Some genes within the gene sets are not contained in the expression data set.\n These genes are removed from the gene sets since rmGSGenes == 'gene'.")
   result = GSALight(badX, y, genesets, rmGSGenes = "gene")
   ind = sapply(genesets, function(x) "g1" %in% x)
